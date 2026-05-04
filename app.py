@@ -4,20 +4,22 @@ import mysql.connector
 app = Flask(__name__)
 app.secret_key = "clave_secreta_123"
 import os
+import mysql.connector
 
-conexion = mysql.connector.connect(
-    host=os.getenv("MYSQLHOST"),
-    user=os.getenv("MYSQLUSER"),
-    password=os.getenv("MYSQLPASSWORD"),
-    database=os.getenv("MYSQL_DATABASE"),
-    port=int(os.getenv("MYSQLPORT"))
-)
-cursor = conexion.cursor()
+try:
+    conexion = mysql.connector.connect(
+        host=os.getenv("MYSQLHOST"),
+        user=os.getenv("MYSQLUSER"),
+        password=os.getenv("MYSQLPASSWORD"),
+        database=os.getenv("MYSQLDATABASE"),
+        port=int(os.getenv("MYSQLPORT", 3306))
+    )
+    cursor = conexion.cursor()
+
 except Exception as e:
     print("ERROR CONEXION:", e)
     conexion = None
     cursor = None
-
 # -----------------------
 # CALCULAR PUNTOS (IGUAL QUE TU APP)
 # -----------------------
