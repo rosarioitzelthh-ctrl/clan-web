@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>🔥 Clan DeathLimite</title>
+
+
+
+
+<style>
+.label {
+    font-size: 10px;
+    color: #aaa;
+    display: block;
+    margin-top: 5px;
+}
+
+
+
+body {
+    background: #1e1e2f;
+    color: white;
+    font-family: Arial;
+    text-align: center;
+}
+
+h1 { color: #00ff99; }
+
+table {
+    margin: auto;
+    border-collapse: collapse;
+    width: 95%;
+}
+
+th, td {
+    padding: 8px;
+    border: 1px solid #444;
+}
+
+th { background: #333; }
+
+tr:nth-child(even) { background: #2b2b3c; }
+tr:nth-child(odd) { background: #242438; }
+
+button {
+    padding: 4px 8px;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-add { background: #4CAF50; color: white; }
+.btn-del { background: #e53935; color: white; }
+.btn-edit { background: #2196F3; color: white; }
+
+input {
+    width: 60px;
+    text-align: center;
+}
+
+/* 🎨 COLORES */
+.verde { color:#00ff99; }
+.amarillo { color:#ffd700; }
+.rojo { color:#ff4d4d; }
+
+
+
+
+
+
+
+
+/* ❤️ CONTENEDOR */
+.hearts {
+    display: inline-block;
+}
+
+/* ❤️ corazones base */
+.heart {
+    display: inline-block;
+    font-size: 18px;
+    animation: latido 1s infinite;
+}
+
+/* 💚 3 vidas */
+.full .heart {
+    color: #00ff99;
+}
+
+/* 💛 2 vidas */
+.mid .heart {
+    color: #ffd700;
+}
+
+/* ❤️ 1 vida (PELIGRO) */
+.low .heart {
+    color: #ff4d4d;
+    animation: latido 1s infinite, peligro 0.3s infinite;
+}
+
+/* 💀 0 vidas */
+.dead {
+    color: #ff0000;
+    font-weight: bold;
+    animation: glitch 0.4s infinite;
+}
+
+/* ❤️ latido */
+@keyframes latido {
+    0% { transform: scale(1); }
+    25% { transform: scale(1.3); }
+    50% { transform: scale(1); }
+    75% { transform: scale(1.3); }
+    100% { transform: scale(1); }
+}
+
+/* ⚠️ peligro */
+@keyframes peligro {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-2px); }
+    50% { transform: translateX(2px); }
+    75% { transform: translateX(-2px); }
+    100% { transform: translateX(0); }
+}
+
+/* 💀 glitch */
+@keyframes glitch {
+    0% { text-shadow: 2px 0 red, -2px 0 blue; }
+    50% { text-shadow: -2px 0 red, 2px 0 blue; }
+    100% { text-shadow: 2px 0 red, -2px 0 blue; }
+}
+
+/* 💛 2 vidas - saltito tipo loading */
+.mid .heart {
+    color: #ffd700;
+    animation: salto 0.6s infinite;
+}
+
+/* delay para que no salten iguales */
+.mid .heart:nth-child(1) {
+    animation-delay: 0s;
+}
+.mid .heart:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+@keyframes salto {
+    0%   { transform: translateY(0); }
+    25%  { transform: translateY(-8px); }
+    50%  { transform: translateY(0); }
+    75%  { transform: translateY(-4px); }
+    100% { transform: translateY(0); }
+}
+
+
+.btn-top {
+    background: linear-gradient(45deg, gold, orange);
+    color: black;
+    font-weight: bold;
+    padding: 10px 15px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 0 10px gold;
+    transition: 0.2s;
+}
+
+.btn-top:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 20px gold;
+}
+
+
+
+
+
+/* 🗑️ eliminar animación */
+@keyframes borrarFila {
+    0% { opacity: 1; transform: translateX(0) rotate(0deg); }
+    30% { transform: translateX(-20px) rotate(-5deg); }
+    60% { transform: translateX(20px) rotate(5deg); }
+    100% { opacity: 0; transform: translateY(50px) scale(0.5) rotate(10deg); }
+}
+
+.eliminando {
+    animation: borrarFila 0.5s forwards;
+}
+
+
+
+
+
+
+
+
+/* 🏆 TOP */
+.top1 {
+    color: gold;
+    font-weight: bold;
+    animation: glowGold 1s infinite alternate;
+}
+
+@keyframes glowGold {
+    from { text-shadow: 0 0 5px gold; }
+    to { text-shadow: 0 0 25px gold, 0 0 40px orange; }
+}
+</style>
+</head>
+
+<body>
+
+<audio id="sonidoTop" src="/static/top.mp3"></audio>
+
+<h1>🔥 CLAN DEATHLIMITE</h1>
+
+<!-- BOTÓN AQUÍ -->
+<a href="/opiniones" style="text-decoration:none;">
+    <div style="
+        display:inline-block;
+        background:#111;
+        color:white;
+        border:2px solid #00ff99;
+        padding:8px 12px;
+        border-radius:8px;
+        cursor:pointer;
+        margin:10px;
+    ">
+        💬 Opiniones anónimas
+    </div>
+</a>
+<button onclick="mostrarTop()" class="btn-top">
+🏆 GANADOR DEL PASE!
+</button>
+<div id="topPlayer" style="
+margin:15px auto;
+padding:15px;
+width:50%;
+background:#111;
+border:2px solid gold;
+border-radius:10px;
+display:none;
+box-shadow:0 0 15px gold;
+font-weight:bold;
+">
+</div>
+
+
+
+
+
+
+<!-- LOGIN -->
+
+{% if request.args.get('error') %}
+<p style="color:red; font-weight:bold;">
+🚫 Datos incorrectos 😑 Vuelve a ingresar tus datos por favor... Si no eres admin zakele pa allá 😤
+</p>
+{% endif %}
+
+{% if not admin %}
+<form action="/login" method="post">
+
+    <input name="user" placeholder="Usuario" style="display:block; margin:auto; margin-bottom:10px;">
+
+    <div style="display:flex; justify-content:center; align-items:center; gap:5px;">
+
+        <input id="pass" name="pass" type="password" placeholder="Contraseña"
+            style="width:180px;">
+
+        <!-- 👁️ ojo push -->
+        <button type="button"
+            id="eyeBtn"
+            onmousedown="showPass()"
+            onmouseup="hidePass()"
+            onmouseleave="hidePass()"
+            ontouchstart="showPass()"
+            ontouchend="hidePass()"
+            style="width:40px; font-size:18px; border-radius:6px; background:#ff4d4d; color:white; border:none;">
+            🙈
+        </button>
+
+        <!-- 🔒 candado azul -->
+        <button type="submit"
+            style="width:40px; font-size:18px; border-radius:6px; background:#2196F3; color:white; border:none;">
+            🔒
+        </button>
+
+    </div>
+
+</form>
+{% else %}
+<p style="color:#00ff99;">ADMIN ACTIVO</p>
+<a href="/logout">Cerrar sesión</a>
+{% endif %}
+
+<br>
+{% if admin %}
+<br><br>
+
+<form action="/agregar" method="post">
+    <input name="nombre" placeholder="Nombre">
+    <input name="id" placeholder="ID">
+    <input name="telefono" placeholder="Teléfono">
+    <button class="btn-add">➕ Agregar jugador</button>
+</form>
+
+
+{% if admin %}
+<a href="/actualizar_vidas">
+    <button class="btn-edit">💀 Actualizar corazones</button>
+</a>
+{% endif %}
+
+{% if admin %}
+<a href="/reset_corazones" onclick="return confirm('¿Restaurar TODOS los corazones a 3?')">
+    <button class="btn-add">❤️ Reset corazones</button>
+</a>
+{% endif %}
+
+{% if admin %}
+
+<a href="/reset_semana" onclick="return confirm('¿Reiniciar semana?')">
+    <button class="btn-del">🔄 Reiniciar semana</button>
+</a>
+
+{% endif %}
+
+
+
+<br>
+{% endif %}
+
+<!-- BUSCAR -->
+<form action="/buscar">
+    <input name="q" placeholder="Buscar">
+    <button>🔍</button>
+</form>
+
+<br>
+
+
+
+{% if no_encontrado %}
+
+<style>
+.no-result {
+    margin:20px auto;
+    padding:15px;
+    width:50%;
+    background:#1a0000;
+    color:#ff4d4d;
+    font-weight:bold;
+    border-radius:10px;
+    text-align:center;
+
+    text-shadow: 0 0 5px red, 0 0 10px red;
+    box-shadow: 0 0 15px red, inset 0 0 10px red;
+
+    animation: aparecer 0.4s ease,
+               shake 0.3s,
+               glitch 0.4s,
+               parpadeo 1s infinite,
+               pulso 2s infinite;
+}
+
+/* aparece */
+@keyframes aparecer {
+    from { opacity:0; transform:translateY(-30px) scale(0.9); }
+    to { opacity:1; transform:translateY(0) scale(1); }
+}
+
+/* vibración */
+@keyframes shake {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-6px); }
+    50% { transform: translateX(6px); }
+    75% { transform: translateX(-4px); }
+    100% { transform: translateX(0); }
+}
+
+/* glitch */
+@keyframes glitch {
+    0% { text-shadow: 2px 0 red, -2px 0 blue; }
+    25% { text-shadow: -2px 0 red, 2px 0 blue; }
+    50% { text-shadow: 2px 2px red, -2px -2px blue; }
+    75% { text-shadow: -2px -2px red, 2px 2px blue; }
+    100% { text-shadow: 0 0 5px red; }
+}
+
+/* parpadeo */
+@keyframes parpadeo {
+    0%, 100% { opacity:1; }
+    50% { opacity:0.6; }
+}
+
+/* pulso */
+@keyframes pulso {
+    0% { box-shadow: 0 0 10px red; }
+    50% { box-shadow: 0 0 25px red; }
+    100% { box-shadow: 0 0 10px red; }
+}
+</style>
+
+<div class="no-result">
+    ❌ ERROR: Jugador no encontrado... 💀🔥
+</div>
+
+{% endif %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table id="tabla">
+
+<tr>
+<th>Nombre</th>
+<th>ID</th>
+<th>Teléfono</th> 
+<th>Honor</th>
+<th>R1</th>
+<th>R2</th>
+<th>R3</th>
+<th>Placas</th>
+<th>Extra</th>
+<th>Puntos</th>
+<th>Vidas</th>
+<th>Acciones</th>
+</tr>
+
+{% for j in jugadores %}
+<tr class="
+{% if loop.index == 1 %}top1
+{% elif loop.index == 2 %}top2
+{% elif loop.index == 3 %}top3
+{% elif j[3] >= 2000 %}verde
+{% elif j[3] >= 1000 %}amarillo
+{% else %}rojo
+{% endif %}
+">
+
+<td>
+{% if loop.index == 1 %}👑 
+{% elif loop.index == 2 %}🥈 
+{% elif loop.index == 3 %}🥉 
+{% endif %}
+{{j[0]}}
+</td>
+
+<td>{{j[1]}}</td>
+<td>{{j[2]}}</td>
+
+<!-- 🔥 HONOR CORREGIDO -->
+<td>
+{% if admin %}
+<form action="/editar_honor/{{j[1]}}" method="post">
+<input name="honor" value="{{j[3]}}">
+<button class="btn-edit">OK</button>
+</form>
+{% else %}{{j[3]}}{% endif %}
+</td>
+
+
+
+<td>
+{% if admin %}
+<form action="/editar_ronda/{{j[1]}}/ronda1_gc" method="post">
+<input name="valor" value="{{j[4]}}">
+<button class="btn-edit">OK</button>
+</form>
+{% else %}{{j[4]}}{% endif %}
+</td>
+
+<td>
+{% if admin %}
+<form action="/editar_ronda/{{j[1]}}/ronda2_gc" method="post">
+<input name="valor" value="{{j[5]}}">
+<button class="btn-edit">OK</button>
+</form>
+{% else %}{{j[5]}}{% endif %}
+</td>
+
+<td>
+{% if admin %}
+<form action="/editar_ronda/{{j[1]}}/ronda3_gc" method="post">
+<input name="valor" value="{{j[6]}}">
+<button class="btn-edit">OK</button>
+</form>
+{% else %}{{j[6]}}{% endif %}
+</td>
+
+<td>{{j[7]}}</td>
+
+<td>
+{% if admin %}
+<form action="/editar_extra/{{j[1]}}" method="post">
+<input name="extra" value="{{j[8]}}">
+<button class="btn-edit">OK</button>
+</form>
+{% else %}{{j[8]}}{% endif %}
+</td>
+
+<td>{{j[9]}}</td>
+
+<!-- ❤️ VIDAS CORREGIDO -->
+<td>
+    {% if j[10] == 0 %}
+        <span class="dead">💀 SIN VIDAS</span>
+
+    {% else %}
+        <span class="hearts 
+            {% if j[10] == 3 %}full
+            {% elif j[10] == 2 %}mid
+            {% else %}low
+            {% endif %}
+        ">
+            {% for i in range(j[10]) %}
+                <span class="heart">❤️</span>
+            {% endfor %}
+        </span>
+    {% endif %}
+</td>
+
+
+<td>
+{% if admin %}
+<div class="label">ELIMINAR</div>
+<a class="btn-del"
+   href="/eliminar/{{j[1]}}"
+   onclick="return eliminarConAnimacion(this, event)">
+   ❌
+</a>
+
+<div class="label">Editar honor</div>
+<form action="/editar_honor/{{j[1]}}" method="post">
+<input name="honor">
+<button class="btn-edit">OK</button>
+</form>
+
+<div class="label">Editar nombre</div>
+<form action="/editar_nombre/{{j[1]}}" method="post">
+<input name="nombre">
+<button class="btn-edit">OK</button>
+</form>
+
+<div class="label">Editar tel</div>
+<form action="/editar_tel/{{j[1]}}" method="post">
+<input name="telefono">
+<button class="btn-edit">OK</button>
+</form>
+
+<div class="label">sumar vida</div>
+<a href="/sumar_vida/{{j[1]}}">➕</a>
+<div class="label">Restar vida</div>
+<a href="/quitar_vida/{{j[1]}}">➖</a>
+
+{% else %}
+👀
+{% endif %}
+</td>
+
+</tr>
+{% endfor %}
+
+</table>
+
+
+{% if request.args.get('q') %}
+
+<br><br>
+
+<div style="background:#111; padding:15px; border-radius:10px; width:60%; margin:auto; box-shadow:0 0 10px #00ff99;">
+
+    <h3>📊 Resultado del jugador</h3>
+
+    {% for j in jugadores %}
+
+        <p><b>{{j[0]}}</b> ({{j[1]}})</p>
+        <p>Honor: {{j[3]}} | Placas: {{j[7]}}</p>
+
+        <div style="
+            margin-top:10px;
+            padding:10px;
+            background:#1e1e2f;
+            border-left:4px solid #00ff99;
+            font-weight:bold;
+            color:#00ff99;
+        ">
+            {{j[11]}}
+        </div>
+
+        <hr>
+
+    {% endfor %}
+
+</div>
+
+{% endif %}
+
+<!-- ⚡ TIEMPO REAL -->
+<script>
+function actualizarTabla(){
+fetch("/datos")
+.then(r=>r.json())
+.then(data=>{
+
+let tabla=document.getElementById("tabla");
+let filas=tabla.querySelectorAll("tr");
+filas.forEach((f,i)=>{ if(i>0) f.remove(); });
+
+data.jugadores.forEach((j,index)=>{
+
+let color="";
+if(index==0) color="gold";
+else if(index==1) color="silver";
+else if(index==2) color="#cd7f32";
+else if(j[3]>=2000) color="#00ff99";
+else if(j[3]>=1000) color="#ffd700";
+else color="#ff4d4d";
+
+let corona = index==0?"👑":index==1?"🥈":index==2?"🥉":"";
+
+let acciones="👀";
+
+{% if admin %}
+acciones=`
+<div class="label">Eliminar</div>
+<a href="/eliminar/${j[1]}" onclick="return confirm('¿Seguro que quieres ELIMINAR este jugador?')">❌</a>
+<div class="label">Editar Honor</div>
+<form action="/editar_honor/${j[1]}" method="post">
+<input name="honor">
+<button>OK</button>
+</form>
+<div class="label">SUMAR VIDA</div>
+<a href="/sumar_vida/${j[1]}">➕</a>
+<div class="label">QUITAR VIDA</div>
+<a href="/quitar_vida/${j[1]}">➖</a>
+`;
+{% endif %}
+
+tabla.innerHTML+=`
+<tr style="color:${color}">
+<td>${corona} ${j[0]}</td>
+<td>${j[1]}</td>
+<td>${j[2]}</td>
+<td>${j[3]}</td>
+<td>${j[4]}</td>
+<td>${j[5]}</td>
+<td>${j[6]}</td>
+<td>${j[7]}</td>
+<td>${j[8]}</td>
+<td>${j[9]}</td>
+<td>
+${
+    parseInt(j[10]) === 0
+    ? '<span class="dead">💀 SIN VIDAS</span>'
+    : `<span class="hearts ${
+        parseInt(j[10])===3 ? 'full'
+        : parseInt(j[10])===2 ? 'mid'
+        : 'low'
+    }">
+        ${Array(parseInt(j[10])).fill('<span class="heart">❤️</span>').join('')}
+      </span>`
+}
+</td>
+<td>${acciones}</td>
+</tr>
+`;
+
+});
+});
+}
+
+setInterval(actualizarTabla,2000);
+actualizarTabla();
+</script>
+
+<script>
+function showPass(){
+    document.getElementById("pass").type = "text";
+
+    let btn = document.getElementById("eyeBtn");
+    btn.innerHTML = "🙉";
+    btn.style.background = "#00ff99"; // verde
+}
+
+function hidePass(){
+    document.getElementById("pass").type = "password";
+
+    let btn = document.getElementById("eyeBtn");
+    btn.innerHTML = "🙈";
+    btn.style.background = "#ff4d4d"; // rojo
+}
+</script>
+
+
+
+<script>
+function eliminarConAnimacion(btn, e){
+    e.preventDefault();
+
+    // 👇 AQUÍ está la pregunta
+    if(!confirm("¿Seguro que quieres ELIMINAR este jugador? 💀")) {
+        return false;
+    }
+
+    let fila = btn.closest("tr");
+    fila.classList.add("eliminando");
+
+    setTimeout(()=>{
+        window.location.href = btn.href;
+    }, 500);
+
+    return false;
+}
+</script>
+
+
+
+
+<script>
+let visibleTop = false;
+
+function mostrarTop(){
+    let box = document.getElementById("topPlayer");
+
+    // si ya está visible -> oculta
+    if(visibleTop){
+        box.style.display = "none";
+        visibleTop = false;
+        return;
+    }
+
+    // 🔊 sonido SOLO al mostrar
+    let audio = document.getElementById("sonidoTop");
+    audio.currentTime = 0;
+    audio.play();
+
+    let tabla = document.getElementById("tabla");
+    let filas = tabla.querySelectorAll("tr");
+
+    if(filas.length <= 1) return;
+
+let mejor = null;
+let maxPuntos = -1;
+let maxHonor = -1;
+
+filas.forEach((fila, i) => {
+    if(i === 0) return; // encabezado
+
+    let datos = fila.children;
+
+    let puntos = parseInt(datos[9].innerText) || 0;
+    let honor = parseInt(datos[3].innerText) || 0;
+
+    if(puntos > maxPuntos || (puntos === maxPuntos && honor > maxHonor)){
+        maxPuntos = puntos;
+        maxHonor = honor;
+        mejor = datos;
+    }
+});
+
+if(!mejor) return;
+
+let nombre = mejor[0].innerText;
+let id = mejor[1].innerText;
+let puntos = maxPuntos;
+
+    box.innerHTML = `
+        👑 HAS GANADO EL PASE (O 300 dmts) 👑 <br><br>
+        Nombre: ${nombre} <br>
+        ID: ${id} <br>
+        Puntos: ${puntos} 🔥
+    `;
+
+    box.style.display = "block";
+    visibleTop = true;
+
+    lanzarConfetti(); // 🎉
+}
+</script>
+
+<script>
+function lanzarConfetti(){
+    for(let i=0;i<30;i++){
+        let conf = document.createElement("div");
+
+        conf.style.position = "fixed";
+        conf.style.width = "8px";
+        conf.style.height = "8px";
+        conf.style.background = ["red","yellow","blue","green","orange"][Math.floor(Math.random()*5)];
+        conf.style.top = "0px";
+        conf.style.left = Math.random()*window.innerWidth + "px";
+        conf.style.opacity = 0.8;
+        conf.style.zIndex = 9999;
+
+        document.body.appendChild(conf);
+
+        let anim = conf.animate([
+            { transform: "translateY(0px)" },
+            { transform: `translateY(${window.innerHeight}px)` }
+        ], {
+            duration: 1000 + Math.random()*1000,
+            easing: "linear"
+        });
+
+        anim.onfinish = () => conf.remove();
+    }
+}
+</script>
+
+
+
+
+
+
+</body>
+</html>

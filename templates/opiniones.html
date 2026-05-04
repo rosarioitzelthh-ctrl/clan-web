@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>💬 Opiniones Anónimas</title>
+
+<style>
+body {
+    background:#1e1e2f;
+    color:white;
+    font-family:Arial;
+    text-align:center;
+}
+
+h1 { color:#00ff99; }
+
+form { margin-top:20px; }
+
+textarea {
+    width:80%;
+    height:100px;
+    border:none;
+    border-radius:10px;
+    padding:10px;
+    font-size:14px;
+    outline:none;
+}
+
+button {
+    margin-top:10px;
+    padding:10px 15px;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+.btn-send {
+    background:#00ff99;
+    color:black;
+}
+
+.btn-back {
+    background:#2196F3;
+    color:white;
+    margin:10px;
+}
+
+table {
+    margin:30px auto;
+    width:80%;
+    border-collapse:collapse;
+}
+
+td, th {
+    border:1px solid #444;
+    padding:10px;
+}
+
+th { background:#333; }
+
+tr:nth-child(even) { background:#2b2b3c; }
+tr:nth-child(odd) { background:#242438; }
+
+.box {
+    background:#111;
+    padding:15px;
+    border-radius:10px;
+    width:85%;
+    margin:auto;
+    box-shadow:0 0 10px #00ff99;
+}
+</style>
+</head>
+
+<body>
+
+<h1>💬 Opiniones Anónimas</h1>
+
+<!-- VOLVER -->
+<a href="/" style="text-decoration:none;">
+    <button class="btn-back">⬅ Volver al clan</button>
+</a>
+
+<!-- FORMULARIO -->
+<div class="box">
+<form action="/agregar_opinion" method="post">
+    <textarea name="opinion" placeholder="Escribe tu opinión del clan..." required></textarea><br>
+    <button class="btn-send">Enviar 💬</button>
+</form>
+</div>
+
+<h2>📋 Opiniones</h2>
+
+<table>
+
+<tr>
+<th>Opinión</th>
+
+{% if admin %}
+<th>Acción</th>
+{% endif %}
+
+</tr>
+
+{% for o in opiniones %}
+<tr>
+<td>{{o}}</td>
+
+{% if admin %}
+<td>
+    <a href="/borrar_opinion/{{loop.index0}}"
+       onclick="return confirm('¿Borrar esta opinión?')"
+       style="color:red; font-weight:bold; text-decoration:none;">
+       ❌ Borrar
+    </a>
+</td>
+{% endif %}
+
+</tr>
+{% endfor %}
+
+</table>
+
+</body>
+</html>
