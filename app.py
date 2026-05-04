@@ -11,7 +11,7 @@ try:
         host=os.getenv("MYSQLHOST"),
         user=os.getenv("MYSQLUSER"),
         password=os.getenv("MYSQLPASSWORD"),
-        database=os.getenv("MYSQLDATABASE"),
+        database=os.getenv("MYSQL_DATABASE"),
         port=int(os.getenv("MYSQLPORT", 3306))
     )
     cursor = conexion.cursor()
