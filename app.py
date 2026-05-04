@@ -13,6 +13,10 @@ conexion = mysql.connector.connect(
     port=int(os.getenv("MYSQLPORT"))
 )
 cursor = conexion.cursor()
+except Exception as e:
+    print("ERROR CONEXION:", e)
+    conexion = None
+    cursor = None
 
 # -----------------------
 # CALCULAR PUNTOS (IGUAL QUE TU APP)
