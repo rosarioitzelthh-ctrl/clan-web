@@ -60,12 +60,18 @@ def calcular_puntuacion(honor, r1, r2, r3, extra):
 # -----------------------
 @app.route("/")
 def inicio():
-    cursor.execute("""
-        SELECT nombre, player_id, telefono,
-        honor, ronda1_gc, ronda2_gc, ronda3_gc,
-        puntos_extra, vidas
-        FROM jugadores
-    """)
+    if cursor is None:
+        return "❌ Error de conexión a la base de datos"
+
+    try:
+        cursor.execute("""
+            SELECT nombre, player_id, telefono,
+            honor, ronda1_gc, ronda2_gc, ronda3_gc,
+            puntos_extra, vidas
+            FROM jugadores
+        """)
+    except Exception as e:
+        return f"💥 Error SQL: {e}"
 
     jugadores = []
 
