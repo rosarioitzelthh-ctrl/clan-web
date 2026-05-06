@@ -17,23 +17,31 @@ import mysql.connector
 
 url = os.getenv("MYSQL_PUBLIC_URL")
 
-if not url:
-    print("❌ NO EXISTE MYSQL_PUBLIC_URL")
-    conexion = None
-    cursor = None
-else:
-    db = urlparse(url)
+def get_db():
+    global conexion, cursor
 
-    conexion = mysql.connector.connect(
-        host=db.hostname,
-        user=db.username,
-        password=db.password,
-        database=db.path.replace("/", ""),
-        port=db.port
-    )
+    try:
+        if conexion is None or not conexion.is_connected():
+            raise Exception("Reconectando...")
+    except:
+        from urllib.parse import urlparse
+        import os
 
-    cursor = conexion.cursor()
-    print("✅ CONECTADO A MYSQL")
+        url = os.getenv("MYSQL_PUBLIC_URL")
+        db = urlparse(url)
+
+        conexion = mysql.connector.connect(
+            host=db.hostname,
+            user=db.username,
+            password=db.password,
+            database=db.path.replace("/", ""),
+            port=db.port
+        )
+
+        cursor = conexion.cursor()
+        print("🔄 RECONEXIÓN A MYSQL")
+
+    return conexion, cursor
 
 # -----------------------
 # CALCULAR PUNTOS (IGUAL QUE TU APP)
@@ -77,8 +85,8 @@ def calcular_puntuacion(honor, r1, r2, r3, extra):
 # -----------------------
 @app.route("/")
 def inicio():
-    if cursor is None:
-        return "❌ Error de conexión a la base de datos"
+
+    conexion, cursor = get_db()
 
     try:
         cursor.execute("""
@@ -91,7 +99,6 @@ def inicio():
         return f"💥 Error SQL: {e}"
 
     jugadores = []
-
     for fila in cursor.fetchall():
 
         telefono = fila[2] or ""
@@ -174,24 +181,30 @@ def logout():
 def agregar():
     if not session.get("admin"):
         return redirect("/")
-    if cursor is None:
-        return "❌ Error de conexión a la base de datos"
-    cursor.execute("""
-        INSERT INTO jugadores
-        (nombre, player_id, telefono,
-         honor,
-         ronda1_gc, ronda2_gc, ronda3_gc,
-         puntos_extra,
-         vidas,
-         penalizado)
-        VALUES (%s,%s,%s,0,0,0,0,0,3,0)
-    """, (
-        request.form["nombre"],
-        request.form["id"],
-        request.form["telefono"]
-    ))
 
-    conexion.commit()
+    conexion, cursor = get_db()
+
+    try:
+        cursor.execute("""
+            INSERT INTO jugadores
+            (nombre, player_id, telefono,
+             honor,
+             ronda1_gc, ronda2_gc, ronda3_gc,
+             puntos_extra,
+             vidas,
+             penalizado)
+            VALUES (%s,%s,%s,0,0,0,0,0,3,0)
+        """, (
+            request.form["nombre"],
+            request.form["id"],
+            request.form["telefono"]
+        ))
+
+        conexion.commit()
+
+    except Exception as e:
+        return f"💥 Error SQL: {e}"
+
     return redirect("/")
 
 
@@ -199,21 +212,24 @@ def agregar():
 # ELIMINAR
 # -----------------------
 @app.route("/eliminar/<id>")
-@app.route("/eliminar/<id>")
 def eliminar(id):
     if not session.get("admin"):
         return redirect("/")
-    if cursor is None:
-        return "❌ Error de conexión a la base de datos"
 
-    cursor.execute(
-        "DELETE FROM jugadores WHERE player_id=%s LIMIT 1",
-        (id,)
-    )
+    try:
+        conexion, cursor = get_db()
 
-    conexion.commit()
+        cursor.execute(
+            "DELETE FROM jugadores WHERE player_id=%s LIMIT 1",
+            (id,)
+        )
+
+        conexion.commit()
+
+    except Exception as e:
+        return f"💥 Error SQL: {e}"
+
     return redirect("/")
-
 # -----------------------
 # EDITAR HONOR
 # -----------------------
@@ -221,11 +237,20 @@ def eliminar(id):
 def editar_honor(id):
     if not session.get("admin"):
         return redirect("/")
-    if cursor is None:
-        return "❌ Error de conexión a la base de datos"
-    cursor.execute("UPDATE jugadores SET honor=%s WHERE player_id=%s",
-                   (request.form["honor"], id))
-    conexion.commit()
+
+    try:
+        conexion, cursor = get_db()
+
+        cursor.execute(
+            "UPDATE jugadores SET honor=%s WHERE player_id=%s",
+            (request.form["honor"], id)
+        )
+
+        conexion.commit()
+
+    except Exception as e:
+        return f"💥 Error SQL: {e}"
+
     return redirect("/")
 
 # -----------------------
@@ -235,18 +260,29 @@ def editar_honor(id):
 def editar_ronda(id, campo):
     if not session.get("admin"):
         return redirect("/")
+
     valor = request.form["valor"]
 
-    if cursor is None:
-        return "❌ Error de conexión a la base de datos"
+    # 🔒 Campos permitidos (IMPORTANTE)
+    campos_validos = ["ronda1_gc", "ronda2_gc", "ronda3_gc"]
 
-    cursor.execute(f"""
-        UPDATE jugadores
-        SET {campo}=%s
-        WHERE player_id=%s
-    """, (valor, id))
+    if campo not in campos_validos:
+        return "❌ Campo inválido"
 
-    conexion.commit()
+    try:
+        conexion, cursor = get_db()
+
+        cursor.execute(f"""
+            UPDATE jugadores
+            SET {campo}=%s
+            WHERE player_id=%s
+        """, (valor, id))
+
+        conexion.commit()
+
+    except Exception as e:
+        return f"💥 Error SQL: {e}"
+
     return redirect("/")
 
 # -----------------------
@@ -256,15 +292,21 @@ def editar_ronda(id, campo):
 def editar_extra(id):
     if not session.get("admin"):
         return redirect("/")
-    if cursor is None:
-        return "❌ Error de conexión a la base de datos"
-    cursor.execute("""
-        UPDATE jugadores
-        SET puntos_extra=%s
-        WHERE player_id=%s
-    """, (request.form["extra"], id))
 
-    conexion.commit()
+    try:
+        conexion, cursor = get_db()
+
+        cursor.execute("""
+            UPDATE jugadores
+            SET puntos_extra=%s
+            WHERE player_id=%s
+        """, (request.form["extra"], id))
+
+        conexion.commit()
+
+    except Exception as e:
+        return f"💥 Error SQL: {e}"
+
     return redirect("/")
 
 # -----------------------
@@ -272,34 +314,40 @@ def editar_extra(id):
 # -----------------------
 @app.route("/contar_vidas")
 def contar_vidas():
-    if cursor is None:
-        return "❌ Error de conexión a la base de datos"
+    try:
+        conexion, cursor = get_db()
 
-    cursor.execute("SELECT player_id, honor, vidas, penalizado FROM jugadores")
+        cursor.execute("SELECT player_id, honor, vidas, penalizado FROM jugadores")
 
-    for player_id, honor, vidas, penalizado in cursor.fetchall():
+        filas = cursor.fetchall()  # 🔥 guardamos primero
 
-        honor = int(honor or 0)
-        vidas = int(vidas or 0)
-        penalizado = int(penalizado or 0)
+        for player_id, honor, vidas, penalizado in filas:
 
-        if honor < 1000 and penalizado == 0:
-            if vidas > 0:
-                cursor.execute("""
-                    UPDATE jugadores
-                    SET vidas = vidas - 1, penalizado = 1
-                    WHERE player_id=%s
-                """, (player_id,))
+            honor = int(honor or 0)
+            vidas = int(vidas or 0)
+            penalizado = int(penalizado or 0)
 
-        elif honor >= 1000 and penalizado == 1:
-            if vidas < 3:
-                cursor.execute("""
-                    UPDATE jugadores
-                    SET vidas = vidas + 1, penalizado = 0
-                    WHERE player_id=%s
-                """, (player_id,))
+            if honor < 1000 and penalizado == 0:
+                if vidas > 0:
+                    cursor.execute("""
+                        UPDATE jugadores
+                        SET vidas = vidas - 1, penalizado = 1
+                        WHERE player_id=%s
+                    """, (player_id,))
 
-    conexion.commit()
+            elif honor >= 1000 and penalizado == 1:
+                if vidas < 3:
+                    cursor.execute("""
+                        UPDATE jugadores
+                        SET vidas = vidas + 1, penalizado = 0
+                        WHERE player_id=%s
+                    """, (player_id,))
+
+        conexion.commit()
+
+    except Exception as e:
+        return f"💥 Error SQL: {e}"
+
     return redirect("/")
 # -----------------------
 # ➕ SUMAR VIDA
@@ -308,14 +356,21 @@ def contar_vidas():
 def sumar_vida(id):
     if not session.get("admin"):
         return redirect("/")
-    if cursor is None:
-        return "❌ Error de conexión a la base de datos"
-    cursor.execute("""
-        UPDATE jugadores
-        SET vidas = LEAST(vidas+1, 3)
-        WHERE player_id=%s
-    """, (id,))
-    conexion.commit()
+
+    try:
+        conexion, cursor = get_db()
+
+        cursor.execute("""
+            UPDATE jugadores
+            SET vidas = LEAST(vidas+1, 3)
+            WHERE player_id=%s
+        """, (id,))
+
+        conexion.commit()
+
+    except Exception as e:
+        return f"💥 Error SQL: {e}"
+
     return redirect("/")
 # -----------------------
 # BUSCAR
@@ -324,9 +379,9 @@ from flask import request, render_template, session
 
 @app.route("/buscar")
 def buscar():
+    conexion, cursor = get_db()
+
     dato = request.args.get("q")
-    if cursor is None:
-        return "❌ Error de conexión a la base de datos"
 
     cursor.execute("""
         SELECT nombre, player_id, telefono,
@@ -382,7 +437,8 @@ def buscar():
             mensaje
         ))
 
-    # 🔥 AQUÍ LA CLAVE
+    conexion.close()  # 🔥 IMPORTANTÍSIMO
+
     no_encontrado = len(jugadores) == 0
     jugadores.sort(key=lambda x: x[3], reverse=True)
 
@@ -390,7 +446,7 @@ def buscar():
         "index.html",
         jugadores=jugadores,
         admin=session.get("admin", False),
-        no_encontrado=no_encontrado  # 👈 FALTABA ESTO
+        no_encontrado=no_encontrado
     )
 
 
@@ -437,8 +493,9 @@ def borrar_opinion(index):
 def actualizar_vidas():
     if not session.get("admin"):
         return redirect("/")
-    if cursor is None:
-        return "❌ Error de conexión a la base de datos"
+
+    conexion, cursor = get_db()
+
     cursor.execute("""
         SELECT player_id, honor, vidas, penalizado
         FROM jugadores
@@ -450,9 +507,8 @@ def actualizar_vidas():
         vidas = int(vidas or 0)
         penalizado = int(penalizado or 0)
 
-        # 💀 CASO 1: pierde vida SOLO UNA VEZ
+        # 💀 pierde vida UNA sola vez
         if honor < 1000 and penalizado == 0:
-
             if vidas > 0:
                 cursor.execute("""
                     UPDATE jugadores
@@ -461,9 +517,8 @@ def actualizar_vidas():
                     WHERE player_id=%s
                 """, (player_id,))
 
-        # ❤️ CASO 2: recupera vida si vuelve a subir honor
+        # ❤️ recupera vida
         elif honor >= 1000 and penalizado == 1:
-
             if vidas < 3:
                 cursor.execute("""
                     UPDATE jugadores
@@ -473,6 +528,9 @@ def actualizar_vidas():
                 """, (player_id,))
 
     conexion.commit()
+    cursor.close()
+    conexion.close()
+
     return redirect("/")
    
 # -----------------------
@@ -482,13 +540,15 @@ def actualizar_vidas():
 def editar_nombre(id):
     if not session.get("admin"):
         return redirect("/")
-    if cursor is None:
-        return "❌ Error de conexión a la base de datos"
+
+    conexion, cursor = get_db()
+
     cursor.execute("""
         UPDATE jugadores
         SET nombre=%s
         WHERE player_id=%s
     """, (request.form["nombre"], id))
+
     conexion.commit()
     return redirect("/")
 
@@ -496,15 +556,21 @@ def editar_nombre(id):
 def reset_corazones():
     if not session.get("admin"):
         return redirect("/")
-    if cursor is None:
-        return "❌ Error de conexión a la base de datos"
-    cursor.execute("""
-        UPDATE jugadores
-        SET vidas = 3,
-            penalizado = 0
-    """)
 
-    conexion.commit()
+    try:
+        conexion, cursor = get_db()
+
+        cursor.execute("""
+            UPDATE jugadores
+            SET vidas = 3,
+                penalizado = 0
+        """)
+
+        conexion.commit()
+
+    except Exception as e:
+        return f"💥 Error SQL: {e}"
+
     return redirect("/")
 # -----------------------
 # EDITAR TELEFONO
@@ -513,14 +579,21 @@ def reset_corazones():
 def editar_tel(id):
     if not session.get("admin"):
         return redirect("/")
-    if cursor is None:
-        return "❌ Error de conexión a la base de datos"
-    cursor.execute("""
-        UPDATE jugadores
-        SET telefono=%s
-        WHERE player_id=%s
-    """, (request.form["telefono"], id))
-    conexion.commit()
+
+    try:
+        conexion, cursor = get_db()
+
+        cursor.execute("""
+            UPDATE jugadores
+            SET telefono=%s
+            WHERE player_id=%s
+        """, (request.form["telefono"], id))
+
+        conexion.commit()
+
+    except Exception as e:
+        return f"💥 Error SQL: {e}"
+
     return redirect("/")
 # -----------------------
 # ➖ QUITAR VIDA
@@ -529,14 +602,21 @@ def editar_tel(id):
 def quitar_vida(id):
     if not session.get("admin"):
         return redirect("/")
-    if cursor is None:
-        return "❌ Error de conexión a la base de datos"
-    cursor.execute("""
-        UPDATE jugadores
-        SET vidas = GREATEST(vidas-1, 0)
-        WHERE player_id=%s
-    """, (id,))
-    conexion.commit()
+
+    try:
+        conexion, cursor = get_db()
+
+        cursor.execute("""
+            UPDATE jugadores
+            SET vidas = GREATEST(vidas-1, 0)
+            WHERE player_id=%s
+        """, (id,))
+
+        conexion.commit()
+
+    except Exception as e:
+        return f"💥 Error SQL: {e}"
+
     return redirect("/")
 # -----------------------
 # RESET SEMANA
@@ -545,15 +625,22 @@ def quitar_vida(id):
 def reset_semana():
     if not session.get("admin"):
         return redirect("/")
-    if cursor is None:
-        return "❌ Error de conexión a la base de datos"
-    cursor.execute("""
-        UPDATE jugadores
-        SET honor=0,
-            ronda1_gc=0,
-            ronda2_gc=0,
-            ronda3_gc=0,
-            penalizado=0
-    """)
-    conexion.commit()
+
+    try:
+        conexion, cursor = get_db()
+
+        cursor.execute("""
+            UPDATE jugadores
+            SET honor=0,
+                ronda1_gc=0,
+                ronda2_gc=0,
+                ronda3_gc=0,
+                penalizado=0
+        """)
+
+        conexion.commit()
+
+    except Exception as e:
+        return f"💥 Error SQL: {e}"
+
     return redirect("/")
