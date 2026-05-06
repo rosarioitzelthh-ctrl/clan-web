@@ -1,25 +1,40 @@
 from flask import Flask, render_template, request, redirect, session
 import mysql.connector
+import logging
+logging.basicConfig(level=logging.INFO)
 
 app = Flask(__name__)
 app.secret_key = "clave_secreta_123"
 import os
+
+
+conexion = None
+cursor = None
+
+from urllib.parse import urlparse
+import os
 import mysql.connector
 
-try:
-    conexion = mysql.connector.connect(
-        host=os.getenv("MYSQLHOST"),
-        user=os.getenv("MYSQLUSER"),
-        password=os.getenv("MYSQLPASSWORD"),
-        database=os.getenv("MYSQL_DATABASE"),
-        port=int(os.getenv("MYSQLPORT", 3306))
-    )
-    cursor = conexion.cursor()
+url = os.getenv("MYSQL_PUBLIC_URL")
 
-except Exception as e:
-    print("ERROR CONEXION:", e)
+if not url:
+    print("❌ NO EXISTE MYSQL_PUBLIC_URL")
     conexion = None
     cursor = None
+else:
+    db = urlparse(url)
+
+    conexion = mysql.connector.connect(
+        host=db.hostname,
+        user=db.username,
+        password=db.password,
+        database=db.path.replace("/", ""),
+        port=db.port
+    )
+
+    cursor = conexion.cursor()
+    print("✅ CONECTADO A MYSQL")
+
 # -----------------------
 # CALCULAR PUNTOS (IGUAL QUE TU APP)
 # -----------------------
@@ -159,6 +174,8 @@ def logout():
 def agregar():
     if not session.get("admin"):
         return redirect("/")
+    if cursor is None:
+        return "❌ Error de conexión a la base de datos"
     cursor.execute("""
         INSERT INTO jugadores
         (nombre, player_id, telefono,
@@ -186,6 +203,8 @@ def agregar():
 def eliminar(id):
     if not session.get("admin"):
         return redirect("/")
+    if cursor is None:
+        return "❌ Error de conexión a la base de datos"
 
     cursor.execute(
         "DELETE FROM jugadores WHERE player_id=%s LIMIT 1",
@@ -202,6 +221,8 @@ def eliminar(id):
 def editar_honor(id):
     if not session.get("admin"):
         return redirect("/")
+    if cursor is None:
+        return "❌ Error de conexión a la base de datos"
     cursor.execute("UPDATE jugadores SET honor=%s WHERE player_id=%s",
                    (request.form["honor"], id))
     conexion.commit()
@@ -215,6 +236,9 @@ def editar_ronda(id, campo):
     if not session.get("admin"):
         return redirect("/")
     valor = request.form["valor"]
+
+    if cursor is None:
+        return "❌ Error de conexión a la base de datos"
 
     cursor.execute(f"""
         UPDATE jugadores
@@ -232,6 +256,8 @@ def editar_ronda(id, campo):
 def editar_extra(id):
     if not session.get("admin"):
         return redirect("/")
+    if cursor is None:
+        return "❌ Error de conexión a la base de datos"
     cursor.execute("""
         UPDATE jugadores
         SET puntos_extra=%s
@@ -246,6 +272,8 @@ def editar_extra(id):
 # -----------------------
 @app.route("/contar_vidas")
 def contar_vidas():
+    if cursor is None:
+        return "❌ Error de conexión a la base de datos"
 
     cursor.execute("SELECT player_id, honor, vidas, penalizado FROM jugadores")
 
@@ -280,6 +308,8 @@ def contar_vidas():
 def sumar_vida(id):
     if not session.get("admin"):
         return redirect("/")
+    if cursor is None:
+        return "❌ Error de conexión a la base de datos"
     cursor.execute("""
         UPDATE jugadores
         SET vidas = LEAST(vidas+1, 3)
@@ -295,6 +325,8 @@ from flask import request, render_template, session
 @app.route("/buscar")
 def buscar():
     dato = request.args.get("q")
+    if cursor is None:
+        return "❌ Error de conexión a la base de datos"
 
     cursor.execute("""
         SELECT nombre, player_id, telefono,
@@ -398,47 +430,15 @@ def borrar_opinion(index):
         jugadores=jugadores,
         admin=session.get("admin", False)
     )
-    return render_template(
-        "index.html",
-        jugadores=jugadores,
-        admin=session.get("admin", False)
-    )
-def actualizar_vidas():
-    cursor.execute("SELECT player_id, honor, vidas, penalizado FROM jugadores")
+  
 
-    for player_id, honor, vidas, penalizado in cursor.fetchall():
-
-        honor = int(honor or 0)
-        vidas = int(vidas or 0)
-        penalizado = int(penalizado or 0)
-
-        # ❌ pierde vida si baja de 1000 y aún no fue penalizado
-        if honor < 1000 and penalizado == 0:
-            if vidas > 0:
-                cursor.execute("""
-                    UPDATE jugadores
-                    SET vidas = vidas - 1,
-                        penalizado = 1
-                    WHERE player_id=%s
-                """, (player_id,))
-
-        # ❤️ recupera vida si sube de 1000
-        elif honor >= 1000 and penalizado == 1:
-            if vidas < 3:
-                cursor.execute("""
-                    UPDATE jugadores
-                    SET vidas = vidas + 1,
-                        penalizado = 0
-                    WHERE player_id=%s
-                """, (player_id,))
-
-    conexion.commit()
 
 @app.route("/actualizar_vidas")
 def actualizar_vidas():
     if not session.get("admin"):
         return redirect("/")
-
+    if cursor is None:
+        return "❌ Error de conexión a la base de datos"
     cursor.execute("""
         SELECT player_id, honor, vidas, penalizado
         FROM jugadores
@@ -482,6 +482,8 @@ def actualizar_vidas():
 def editar_nombre(id):
     if not session.get("admin"):
         return redirect("/")
+    if cursor is None:
+        return "❌ Error de conexión a la base de datos"
     cursor.execute("""
         UPDATE jugadores
         SET nombre=%s
@@ -494,7 +496,8 @@ def editar_nombre(id):
 def reset_corazones():
     if not session.get("admin"):
         return redirect("/")
-
+    if cursor is None:
+        return "❌ Error de conexión a la base de datos"
     cursor.execute("""
         UPDATE jugadores
         SET vidas = 3,
@@ -510,6 +513,8 @@ def reset_corazones():
 def editar_tel(id):
     if not session.get("admin"):
         return redirect("/")
+    if cursor is None:
+        return "❌ Error de conexión a la base de datos"
     cursor.execute("""
         UPDATE jugadores
         SET telefono=%s
@@ -524,6 +529,8 @@ def editar_tel(id):
 def quitar_vida(id):
     if not session.get("admin"):
         return redirect("/")
+    if cursor is None:
+        return "❌ Error de conexión a la base de datos"
     cursor.execute("""
         UPDATE jugadores
         SET vidas = GREATEST(vidas-1, 0)
@@ -538,6 +545,8 @@ def quitar_vida(id):
 def reset_semana():
     if not session.get("admin"):
         return redirect("/")
+    if cursor is None:
+        return "❌ Error de conexión a la base de datos"
     cursor.execute("""
         UPDATE jugadores
         SET honor=0,
@@ -548,10 +557,3 @@ def reset_semana():
     """)
     conexion.commit()
     return redirect("/")
-
-import os
-
-app.run(
-    host="0.0.0.0",
-    port=int(os.environ.get("PORT", 5000))
-)
