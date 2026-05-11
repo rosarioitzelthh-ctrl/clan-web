@@ -421,6 +421,7 @@ font-weight:bold;
 <table id="tabla">
 
 <tr>
+<th>#</th>
 <th>Nombre</th>
 <th>ID</th>
 <th>Teléfono</th> 
@@ -447,6 +448,7 @@ font-weight:bold;
 ">
 
 <td>
+<td>{{ loop.index }}</td>
 {% if loop.index == 1 %}👑 
 {% elif loop.index == 2 %}🥈 
 {% elif loop.index == 3 %}🥉 
@@ -647,6 +649,7 @@ acciones=`
 
 tabla.innerHTML+=`
 <tr style="color:${color}">
+<td>${index + 1}</td>
 <td>${corona} ${j[0]}</td>
 <td>${j[1]}</td>
 <td>${j[2]}</td>
