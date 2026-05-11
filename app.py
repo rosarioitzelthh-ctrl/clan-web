@@ -57,7 +57,11 @@ def calcular_puntuacion(honor, r1, r2, r3, extra):
     placas = r1 + r2 + r3
 
     # HONOR
-    if honor >= 10000:
+    if honor >= 19000:
+        puntos_honor = 20
+    elif honor >= 15000:
+        puntos_honor = 12
+    elif honor >= 10000:
         puntos_honor = 8
     elif honor >= 4000:
         puntos_honor = 5
