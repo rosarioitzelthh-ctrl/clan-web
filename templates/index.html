@@ -775,16 +775,16 @@ filas.forEach((fila, i) => {
 
 if(!mejor) return;
 
-let nombre = mejor[0].innerText;
-let id = mejor[1].innerText;
-let puntos = maxPuntos;
+let nombre = mejor[1].innerText;
+let id = mejor[2].innerText;
+let puntosFinal = maxPuntos;
 
-    box.innerHTML = `
-        👑 HAS GANADO EL PASE (O 300 dmts) 👑 <br><br>
-        Nombre: ${nombre} <br>
-        ID: ${id} <br>
-        Puntos: ${puntos} 🔥
-    `;
+box.innerHTML = `
+    👑 HAS GANADO EL PASE (O 300 dmts) 👑 <br><br>
+    Nombre: ${nombre} <br>
+    ID: ${id} <br>
+    Puntos: ${puntosFinal} 🔥
+`;
 
     box.style.display = "block";
     visibleTop = true;
