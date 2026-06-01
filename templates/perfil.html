@@ -1,19 +1,161 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Perfil</title>
+    <meta charset="UTF-8">
+    <title>{{ jugador[0] }}</title>
+
+    <style>
+        body{
+            background:#1e1e2f;
+            color:white;
+            font-family:Arial;
+            text-align:center;
+            margin:0;
+            padding:20px;
+        }
+
+        .perfil{
+            width:80%;
+            max-width:800px;
+            margin:auto;
+            background:#242438;
+            border-radius:15px;
+            padding:20px;
+            box-shadow:0 0 15px rgba(0,255,153,0.3);
+        }
+
+        h1{
+            color:#00ff99;
+        }
+
+        .dato{
+            margin:10px;
+            font-size:18px;
+        }
+
+        .opiniones{
+            margin-top:30px;
+            text-align:left;
+            background:#1a1a28;
+            padding:15px;
+            border-radius:10px;
+        }
+
+        textarea{
+            width:95%;
+            height:100px;
+            border-radius:10px;
+            border:none;
+            padding:10px;
+            resize:none;
+        }
+
+        input{
+            padding:8px;
+            border-radius:8px;
+            border:none;
+            margin-top:10px;
+        }
+
+        button{
+            background:#00ff99;
+            border:none;
+            padding:10px 15px;
+            border-radius:8px;
+            cursor:pointer;
+            font-weight:bold;
+            margin-top:10px;
+        }
+
+        a{
+            color:#00ff99;
+            text-decoration:none;
+        }
+
+        .opinion{
+            background:#2b2b3c;
+            padding:10px;
+            margin-top:10px;
+            border-radius:8px;
+        }
+    </style>
 </head>
+
 <body>
 
-<h1>{{ jugador[0] }}</h1>
+<div class="perfil">
 
-<p>ID: {{ jugador[1] }}</p>
+    <h1>👤 {{ jugador[0] }}</h1>
 
-<p>Teléfono: {{ jugador[2] }}</p>
+    <div class="dato">
+        <b>ID:</b> {{ jugador[1] }}
+    </div>
 
-<p>Honor: {{ jugador[3] }}</p>
+    <div class="dato">
+        <b>📱 Teléfono:</b> {{ jugador[2] }}
+    </div>
 
-<a href="/">⬅ Volver</a>
+    <div class="dato">
+        <b>🔥 Honor:</b> {{ jugador[3] }}
+    </div>
+
+    <div class="opiniones">
+
+        <h2>💬 Opiniones</h2>
+
+        <form action="/agregar_opinion_jugador/{{ jugador[1] }}" method="post">
+
+            <input
+                name="autor"
+                placeholder="Tu nombre"
+                required
+            >
+
+            <br><br>
+
+            <textarea
+                name="comentario"
+                placeholder="Escribe una opinión..."
+                required
+            ></textarea>
+
+            <br>
+
+            <button type="submit">
+                Enviar opinión
+            </button>
+
+        </form>
+
+        <hr>
+
+        {% if opiniones %}
+
+            {% for op in opiniones %}
+
+                <div class="opinion">
+
+                    <b>{{ op[0] }}</b>
+
+                    <p>{{ op[1] }}</p>
+
+                </div>
+
+            {% endfor %}
+
+        {% else %}
+
+            <p>No hay opiniones todavía.</p>
+
+        {% endif %}
+
+    </div>
+
+    <br>
+
+    <a href="/">⬅ Volver al ranking</a>
+
+</div>
 
 </body>
 </html>
