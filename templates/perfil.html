@@ -135,19 +135,21 @@
 
         <div class="opinion">
 
-            <b>👤 {{ op[1] }}</b>
+    {% if admin %}
+        <b>👤 {{ op[1] }}</b>
+    {% endif %}
 
-            <p>{{ op[2] }}</p>
+    <p>{{ op[2] }}</p>
 
-            {% if admin %}
-                <a
-                    href="/borrar_opinion_jugador/{{ op[0] }}"
-                    onclick="return confirm('¿Eliminar esta opinión?')"
-                    style="color:#ff4d4d;"
-                >
-                    🗑️ Eliminar
-                </a>
-            {% endif %}
+    {% if admin %}
+        <a href="/borrar_opinion_jugador/{{ op[0] }}"
+           onclick="return confirm('¿Eliminar esta opinión?')"
+           style="color:#ff4d4d;">
+           🗑️ Eliminar
+        </a>
+    {% endif %}
+
+</div>
 
         </div>
 
