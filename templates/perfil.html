@@ -22,10 +22,55 @@
             border-radius:15px;
             padding:20px;
             box-shadow:0 0 15px rgba(0,255,153,0.3);
+            overflow:hidden;
+        }
+
+        .portada{
+            height:200px;
+            border-radius:15px;
+            background:#777;
+            background-size:cover;
+            background-position:center;
+        }
+
+        .foto-perfil{
+            width:130px;
+            height:130px;
+            border-radius:50%;
+            object-fit:cover;
+            border:5px solid white;
+            margin-top:-65px;
+            background:white;
+        }
+
+        .foto-default{
+            width:130px;
+            height:130px;
+            border-radius:50%;
+            border:5px solid white;
+            margin:-65px auto 10px;
+            background:white;
+            color:#777;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-size:55px;
         }
 
         h1{
             color:#00ff99;
+        }
+
+        .descripcion{
+            color:#ccc;
+            background:#1a1a28;
+            padding:10px;
+            border-radius:10px;
+            max-width:90%;
+            margin:10px auto;
+            word-wrap:break-word;
+            overflow-wrap:break-word;
+            white-space:pre-wrap;
         }
 
         .dato{
@@ -39,7 +84,6 @@
             background:#1a1a28;
             padding:15px;
             border-radius:10px;
-
             max-height:600px;
             overflow-y:auto;
         }
@@ -80,11 +124,9 @@
             padding:10px;
             margin-top:10px;
             border-radius:8px;
-
             word-wrap: break-word;
             overflow-wrap: break-word;
             white-space: pre-wrap;
-
             max-width:100%;
         }
 
@@ -94,6 +136,16 @@
             border-radius:10px;
             margin-bottom:15px;
         }
+
+        .btn-edit{
+            display:inline-block;
+            padding:10px 15px;
+            background:#2196F3;
+            color:white;
+            border-radius:8px;
+            text-decoration:none;
+            font-weight:bold;
+        }
     </style>
 </head>
 
@@ -101,7 +153,25 @@
 
 <div class="perfil">
 
+    {% if perfil and perfil[1] %}
+        <div class="portada" style="background-image:url('{{ perfil[1] }}');"></div>
+    {% else %}
+        <div class="portada"></div>
+    {% endif %}
+
+    {% if perfil and perfil[0] %}
+        <img src="{{ perfil[0] }}" class="foto-perfil">
+    {% else %}
+        <div class="foto-default">👤</div>
+    {% endif %}
+
     <h1>👤 {{ jugador[0] }}</h1>
+
+    {% if perfil and perfil[2] %}
+        <div class="descripcion">
+            {{ perfil[2] }}
+        </div>
+    {% endif %}
 
     <div class="dato">
         <b>ID:</b> {{ jugador[1] }}
@@ -111,78 +181,50 @@
         <b>📱 Teléfono:</b> {{ jugador[2] }}
     </div>
 
-<div class="dato">
-    <b>🔥 Honor:</b> {{ jugador[3] }}
-</div>
+    <div class="dato">
+        <b>🔥 Honor:</b> {{ jugador[3] }}
+    </div>
 
-{% if session.get("jugador_id") == jugador[1] %}
-    <br>
+    {% if session.get("jugador_id") == jugador[1] %}
+        <br>
+        <a href="/editar_perfil/{{ jugador[1] }}" class="btn-edit">
+            ⚙️ Editar perfil
+        </a>
+        <br><br>
+    {% endif %}
 
-    <a href="/editar_perfil/{{ jugador[1] }}"
-       style="
-            display:inline-block;
-            padding:10px 15px;
-            background:#2196F3;
-            color:white;
-            border-radius:8px;
-            text-decoration:none;
-            font-weight:bold;
-       ">
-       ⚙️ Editar perfil
-    </a>
-
-    <br><br>
-{% endif %}
-
-<div class="opiniones">
+    <div class="opiniones">
 
         {% if not session.get("jugador_id") %}
 
-        <div class="login-box">
+            <div class="login-box">
+                <form action="/login_jugador" method="post">
 
-            <form action="/login_jugador" method="post">
+                    <input type="hidden" name="volver" value="{{ request.path }}">
 
-                <input
-                    type="hidden"
-                    name="volver"
-                    value="{{ request.path }}"
-                >
+                    <input name="player_id" placeholder="Tu ID" required>
 
-                <input
-                    name="player_id"
-                    placeholder="Tu ID"
-                    required
-                >
+                    <input type="password" name="password" placeholder="Contraseña" required>
 
-                <input
-                    type="password"
-                    name="password"
-                    placeholder="Contraseña"
-                    required
-                >
+                    <button type="submit">
+                        🔐 Iniciar sesión
+                    </button>
 
-                <button type="submit">
-                    🔐 Iniciar sesión
-                </button>
-
-            </form>
-
-        </div>
+                </form>
+            </div>
 
         {% else %}
 
-        <div class="login-box">
+            <div class="login-box">
+                <p style="color:#00ff99;">
+                    🔓 Sesión iniciada como
+                    <b>{{ session["jugador_id"] }}</b>
+                </p>
 
-            <p style="color:#00ff99;">
-                🔓 Sesión iniciada como
-                <b>{{ session["jugador_id"] }}</b>
-            </p>
-
-            <a href="/logout_jugador">
-                🚪 Cerrar sesión
-            </a>
-
-        </div>
+                <a href="/logout_jugador">
+                    🚪 Cerrar sesión
+                </a>
+            </div>
 
         {% endif %}
 
@@ -190,59 +232,59 @@
 
         {% if session.get("jugador_id") %}
 
-        <form action="/agregar_opinion_jugador/{{ jugador[1] }}" method="post">
+            <form action="/agregar_opinion_jugador/{{ jugador[1] }}" method="post">
 
-            <textarea
-                name="comentario"
-                placeholder="Escribe una opinión..."
-                required
-            ></textarea>
+                <textarea
+                    name="comentario"
+                    placeholder="Escribe una opinión..."
+                    required
+                ></textarea>
 
-            <br>
+                <br>
 
-            <button type="submit">
-                Enviar opinión
-            </button>
+                <button type="submit">
+                    Enviar opinión
+                </button>
 
-        </form>
+            </form>
 
-        <hr>
+            <hr>
 
         {% endif %}
 
-{% if opiniones %}
+        {% if opiniones %}
 
-    {% for op in opiniones %}
+            {% for op in opiniones %}
 
-        <div class="opinion">
+                <div class="opinion">
 
-            {% if admin %}
-                <b>👤 {{ op[2] }}</b>
-                <small style="color:gray;">
-                    (ID: {{ op[1] }})
-                </small>
-                <br><br>
-            {% endif %}
+                    {% if admin %}
+                        <b>👤 {{ op[2] }}</b>
+                        <small style="color:gray;">
+                            (ID: {{ op[1] }})
+                        </small>
+                        <br><br>
+                    {% endif %}
 
-            <p>{{ op[3] }}</p>
+                    <p>{{ op[3] }}</p>
 
-            {% if admin %}
-                <a href="/borrar_opinion_jugador/{{ op[0] }}"
-                   onclick="return confirm('¿Eliminar esta opinión?')"
-                   style="color:#ff4d4d;">
-                   🗑️ Eliminar
-                </a>
-            {% endif %}
+                    {% if admin %}
+                        <a href="/borrar_opinion_jugador/{{ op[0] }}"
+                           onclick="return confirm('¿Eliminar esta opinión?')"
+                           style="color:#ff4d4d;">
+                           🗑️ Eliminar
+                        </a>
+                    {% endif %}
 
-        </div>
+                </div>
 
-    {% endfor %}
+            {% endfor %}
 
-{% else %}
+        {% else %}
 
-    <p>No hay opiniones todavía.</p>
+            <p>No hay opiniones todavía.</p>
 
-{% endif %}
+        {% endif %}
 
     </div>
 

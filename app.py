@@ -685,7 +685,6 @@ def perfil(id):
 
     conexion, cursor = get_db()
 
-    # Datos del jugador
     cursor.execute("""
         SELECT *
         FROM jugadores
@@ -694,7 +693,14 @@ def perfil(id):
 
     jugador = cursor.fetchone()
 
-    # Opiniones del jugador
+    cursor.execute("""
+        SELECT foto_perfil, foto_portada, descripcion
+        FROM perfiles
+        WHERE player_id=%s
+    """, (id,))
+
+    perfil = cursor.fetchone()
+
     cursor.execute("""
         SELECT
             o.id,
@@ -713,10 +719,10 @@ def perfil(id):
     return render_template(
         "perfil.html",
         jugador=jugador,
+        perfil=perfil,
         opiniones=opiniones,
         admin=session.get("admin", False)
     )
-
 @app.route("/agregar_opinion_jugador/<id>", methods=["POST"])
 def agregar_opinion_jugador(id):
 
