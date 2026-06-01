@@ -931,23 +931,32 @@ function lanzarConfetti(){
 let visibleCumples = false;
 
 function mostrarCumples(){
+
     let box = document.getElementById("cumplesBox");
-
     let audio = document.getElementById("sonidoCumple");
-    audio.currentTime = 0;
-    audio.play();
 
+    // 🔒 si está abierto -> cerrar y parar música
     if(visibleCumples){
+
         box.style.display = "none";
         visibleCumples = false;
+
+        audio.pause();
+        audio.currentTime = 0;
+
         return;
     }
 
+    // 🎉 abrir
     box.style.display = "block";
     visibleCumples = true;
 
+    audio.currentTime = 0;
+    audio.play();
+
     lanzarConfettiCumple();
 }
+
 
 function lanzarConfettiCumple(){
     let emojis = ["🎂","🎉","🥳","🎈","✨","🍰"];
