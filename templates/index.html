@@ -757,6 +757,14 @@ function eliminarConAnimacion(btn, e){
 <script>
 let filtroActivo = "todos";
 
+function valorCelda(celda){
+    let input = celda.querySelector("input");
+    if(input){
+        return input.value;
+    }
+    return celda.innerText;
+}
+
 function filtrarTabla(tipo){
     filtroActivo = tipo;
 
@@ -764,12 +772,11 @@ function filtrarTabla(tipo){
     let filas = tabla.querySelectorAll("tr");
 
     filas.forEach((fila, index) => {
-
         if(index === 0) return;
 
         let celdas = fila.children;
 
-        let honor = parseInt(celdas[4].innerText) || 0;
+        let honor = parseInt(valorCelda(celdas[4])) || 0;
         let vidasTexto = celdas[11].innerText;
 
         let mostrar = true;
@@ -791,11 +798,9 @@ function filtrarTabla(tipo){
         }
 
         fila.style.display = mostrar ? "" : "none";
-
     });
 }
 </script>
-
 <script>
 let visibleTop = false;
 
