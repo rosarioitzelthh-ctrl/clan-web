@@ -219,7 +219,7 @@ def agregar():
             "1234"
         ))
 
-conexion.commit()
+
 
         conexion.commit()
 
