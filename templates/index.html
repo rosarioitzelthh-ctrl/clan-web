@@ -209,6 +209,7 @@ input {
 <body>
 
 <audio id="sonidoTop" src="/static/top.mp3"></audio>
+<audio id="sonidoCumple" src="/static/cumple.mp3"></audio>
 
 <h1>🔥 CLAN DEATHLIMITE</h1>
 
@@ -931,6 +932,10 @@ let visibleCumples = false;
 
 function mostrarCumples(){
     let box = document.getElementById("cumplesBox");
+
+    let audio = document.getElementById("sonidoCumple");
+    audio.currentTime = 0;
+    audio.play();
 
     if(visibleCumples){
         box.style.display = "none";
