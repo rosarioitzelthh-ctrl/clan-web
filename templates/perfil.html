@@ -203,14 +203,50 @@
 
                     <input type="hidden" name="volver" value="{{ request.path }}">
 
-                    <input name="player_id" placeholder="Tu ID" required>
+<input
+    name="player_id"
+    placeholder="Tu ID"
+    required
+>
 
-                    <input type="password" name="password" placeholder="Contraseña" required>
+<div style="
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:5px;
+">
 
-                    <button type="submit">
-                        🔐 Iniciar sesión
-                    </button>
+    <input
+        id="passJugador"
+        type="password"
+        name="password"
+        placeholder="Contraseña"
+        required
+    >
 
+    <button
+        type="button"
+        id="monoBtn"
+        onmousedown="showPassJugador()"
+        onmouseup="hidePassJugador()"
+        onmouseleave="hidePassJugador()"
+        ontouchstart="showPassJugador()"
+        ontouchend="hidePassJugador()"
+        style="
+            width:40px;
+            border-radius:8px;
+            background:#ff4d4d;
+            color:white;
+            margin-top:10px;
+        ">
+        🙈
+    </button>
+
+</div>
+
+<button type="submit">
+    🔐 Iniciar sesión
+</button>
                 </form>
             </div>
 
@@ -294,6 +330,26 @@
     <a href="/">⬅ Volver al ranking</a>
 
 </div>
+<script>
+function showPassJugador(){
 
+    document.getElementById("passJugador").type = "text";
+
+    let btn = document.getElementById("monoBtn");
+
+    btn.innerHTML = "🙉";
+    btn.style.background = "#00ff99";
+}
+
+function hidePassJugador(){
+
+    document.getElementById("passJugador").type = "password";
+
+    let btn = document.getElementById("monoBtn");
+
+    btn.innerHTML = "🙈";
+    btn.style.background = "#ff4d4d";
+}
+</script>
 </body>
 </html>

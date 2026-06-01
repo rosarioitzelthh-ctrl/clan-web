@@ -799,7 +799,65 @@ def logout_jugador():
 def editar_perfil(id):
 
     if session.get("jugador_id") != id:
-        return redirect("/")
+
+        return """
+        <html>
+        <body style="
+            background:#1e1e2f;
+            color:white;
+            font-family:Arial;
+            text-align:center;
+            padding-top:80px;
+        ">
+
+        <div style="
+            background:#242438;
+            width:70%;
+            margin:auto;
+            padding:30px;
+            border-radius:15px;
+            box-shadow:0 0 15px red;
+        ">
+
+            <div style="font-size:120px;">
+                🙈
+            </div>
+
+            <h1 style="color:#ff4d4d;">
+                ¡ALTO AHÍ!
+            </h1>
+
+            <h2>
+                ¿Intentando entrar al perfil de otro jugador? 🤨
+            </h2>
+
+            <p style="font-size:20px;">
+                Muy mal... muy mal... 😤
+            </p>
+
+            <p style="color:#aaa;">
+                El changuito ya tomó nota de tus acciones sospechosas 👀
+            </p>
+
+            <br>
+
+            <a href="/"
+               style="
+                    background:#00ff99;
+                    color:black;
+                    padding:10px 15px;
+                    border-radius:10px;
+                    text-decoration:none;
+                    font-weight:bold;
+               ">
+                🏃 Huir rápidamente
+            </a>
+
+        </div>
+
+        </body>
+        </html>
+        """
 
     conexion, cursor = get_db()
 
