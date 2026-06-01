@@ -201,54 +201,72 @@
             <div class="login-box">
                 <form action="/login_jugador" method="post">
 
-                    <input type="hidden" name="volver" value="{{ request.path }}">
-
-<input
-    name="player_id"
-    placeholder="Tu ID"
-    required
->
-
-<div style="
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    gap:5px;
-">
-
     <input
-        id="passJugador"
-        type="password"
-        name="password"
-        placeholder="Contraseña"
-        required
+        type="hidden"
+        name="volver"
+        value="{{ request.path }}"
     >
 
-    <button
-        type="button"
-        id="monoBtn"
-        onmousedown="showPassJugador()"
-        onmouseup="hidePassJugador()"
-        onmouseleave="hidePassJugador()"
-        ontouchstart="showPassJugador()"
-        ontouchend="hidePassJugador()"
-        style="
-            width:40px;
-            border-radius:8px;
-            background:#ff4d4d;
-            color:white;
-            margin-top:10px;
+    <div style="
+        display:flex;
+        justify-content:center;
+        align-items:center;
+        gap:10px;
+        flex-wrap:wrap;
+    ">
+
+        <input
+            name="player_id"
+            placeholder="Tu ID"
+            required
+        >
+
+        <div style="
+            position:relative;
+            display:inline-block;
         ">
-        🙈
-    </button>
 
-</div>
+            <input
+                id="passJugador"
+                type="password"
+                name="password"
+                placeholder="Contraseña"
+                required
+                style="
+                    padding-right:40px;
+                "
+            >
 
-<button type="submit">
-    🔐 Iniciar sesión
-</button>
-                </form>
-            </div>
+            <span
+                id="monoBtn"
+                onmousedown="showPassJugador()"
+                onmouseup="hidePassJugador()"
+                onmouseleave="hidePassJugador()"
+                ontouchstart="showPassJugador()"
+                ontouchend="hidePassJugador()"
+
+                style="
+                    position:absolute;
+                    right:12px;
+                    top:50%;
+                    transform:translateY(-50%);
+                    cursor:pointer;
+                    font-size:20px;
+                    user-select:none;
+                ">
+                🙈
+            </span>
+
+        </div>
+
+        <button type="submit">
+            🔐 Iniciar sesión
+        </button>
+
+    </div>
+
+</form>
+
 
         {% else %}
 
