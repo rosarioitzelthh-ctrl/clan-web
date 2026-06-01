@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, session
+from flask import Flask, render_template, request, redirect, session, jsonify
 import mysql.connector
 import logging
 logging.basicConfig(level=logging.INFO)
@@ -845,3 +845,44 @@ def guardar_perfil(id):
     conexion.commit()
 
     return redirect(f"/perfil/{id}")
+
+@app.route("/datos")
+def datos():
+    conexion, cursor = get_db()
+
+    cursor.execute("""
+        SELECT nombre, player_id, telefono,
+        honor, ronda1_gc, ronda2_gc, ronda3_gc,
+        puntos_extra, vidas
+        FROM jugadores
+    """)
+
+    jugadores = []
+
+    for fila in cursor.fetchall():
+        honor = int(fila[3] or 0)
+        r1 = int(fila[4] or 0)
+        r2 = int(fila[5] or 0)
+        r3 = int(fila[6] or 0)
+        extra = int(fila[7] or 0)
+        vidas = int(fila[8] or 0)
+
+        placas, puntos = calcular_puntuacion(honor, r1, r2, r3, extra)
+
+        jugadores.append([
+            fila[0],
+            fila[1],
+            fila[2] or "",
+            honor,
+            r1,
+            r2,
+            r3,
+            placas,
+            extra,
+            puntos,
+            vidas
+        ])
+
+    jugadores.sort(key=lambda x: x[3], reverse=True)
+
+    return jsonify({"jugadores": jugadores})

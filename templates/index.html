@@ -322,6 +322,26 @@ font-weight:bold;
     <button class="btn-del">🔄 Reiniciar semana</button>
 </a>
 
+<br><br>
+
+<button class="btn-del" onclick="filtrarTabla('sin_vidas')">
+    💀 Sin vidas
+</button>
+
+<button class="btn-del" onclick="filtrarTabla('rojos')">
+    🔴 En rojo
+</button>
+
+<button class="btn-del" onclick="filtrarTabla('honor_0')">
+    0️⃣ Honor 0
+</button>
+
+<button class="btn-add" onclick="filtrarTabla('todos')">
+    👁️ Ver todos
+</button>
+
+
+
 {% endif %}
 
 
@@ -685,6 +705,7 @@ ${
 `;
 
 });
+filtrarTabla(filtroActivo);
 });
 }
 
@@ -733,7 +754,47 @@ function eliminarConAnimacion(btn, e){
 </script>
 
 
+<script>
+let filtroActivo = "todos";
 
+function filtrarTabla(tipo){
+    filtroActivo = tipo;
+
+    let tabla = document.getElementById("tabla");
+    let filas = tabla.querySelectorAll("tr");
+
+    filas.forEach((fila, index) => {
+
+        if(index === 0) return;
+
+        let celdas = fila.children;
+
+        let honor = parseInt(celdas[4].innerText) || 0;
+        let vidasTexto = celdas[11].innerText;
+
+        let mostrar = true;
+
+        if(tipo === "sin_vidas"){
+            mostrar = vidasTexto.includes("SIN VIDAS");
+        }
+
+        if(tipo === "rojos"){
+            mostrar = honor < 1000;
+        }
+
+        if(tipo === "honor_0"){
+            mostrar = honor === 0;
+        }
+
+        if(tipo === "todos"){
+            mostrar = true;
+        }
+
+        fila.style.display = mostrar ? "" : "none";
+
+    });
+}
+</script>
 
 <script>
 let visibleTop = false;
