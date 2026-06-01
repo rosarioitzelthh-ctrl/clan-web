@@ -798,18 +798,20 @@ def editar_perfil(id):
     conexion, cursor = get_db()
 
     cursor.execute("""
-        SELECT *
+        SELECT player_id, password, foto_perfil, foto_portada, descripcion
         FROM perfiles
         WHERE player_id=%s
     """, (id,))
 
     perfil = cursor.fetchone()
 
+    if not perfil:
+        return f"❌ No existe perfil para el ID {id}."
+
     return render_template(
         "editar_perfil.html",
         perfil=perfil
     )
-
 @app.route("/guardar_perfil/<id>", methods=["POST"])
 def guardar_perfil(id):
 

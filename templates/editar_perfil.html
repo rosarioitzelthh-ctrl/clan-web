@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Editar perfil</title>
+
+    <style>
+        body{
+            background:#1e1e2f;
+            color:white;
+            font-family:Arial;
+            text-align:center;
+            margin:0;
+            padding:20px;
+        }
+
+        .box{
+            width:80%;
+            max-width:600px;
+            margin:auto;
+            background:#242438;
+            border-radius:15px;
+            padding:20px;
+            box-shadow:0 0 15px rgba(0,255,153,0.3);
+        }
+
+        h1{
+            color:#00ff99;
+        }
+
+        input, textarea{
+            width:90%;
+            padding:10px;
+            border-radius:8px;
+            border:none;
+            margin:8px;
+        }
+
+        textarea{
+            height:120px;
+            resize:none;
+        }
+
+        button{
+            background:#00ff99;
+            border:none;
+            padding:10px 15px;
+            border-radius:8px;
+            font-weight:bold;
+            cursor:pointer;
+        }
+
+        a{
+            color:#00ff99;
+            text-decoration:none;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="box">
+
+    <h1>⚙️ Editar perfil</h1>
+
+    <form action="/guardar_perfil/{{ perfil[0] }}" method="post">
+
+        <p>🔐 Contraseña</p>
+        <input
+            name="password"
+            value="{{ perfil[1] }}"
+            required
+        >
+
+        <p>🖼️ Foto de perfil URL</p>
+        <input
+            name="foto_perfil"
+            value="{{ perfil[2] or '' }}"
+            placeholder="Pega aquí el link de tu foto"
+        >
+
+        <p>🌄 Foto de portada URL</p>
+        <input
+            name="foto_portada"
+            value="{{ perfil[3] or '' }}"
+            placeholder="Pega aquí el link de tu portada"
+        >
+
+        <p>📝 Descripción</p>
+        <textarea
+            name="descripcion"
+            placeholder="Escribe algo sobre ti..."
+        >{{ perfil[4] or '' }}</textarea>
+
+        <br><br>
+
+        <button type="submit">
+            Guardar cambios
+        </button>
+
+    </form>
+
+    <br><br>
+
+    <a href="/perfil/{{ perfil[0] }}">
+        ⬅ Volver al perfil
+    </a>
+
+</div>
+
+</body>
+</html>
