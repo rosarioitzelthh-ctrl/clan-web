@@ -140,10 +140,12 @@
             <p>{{ op[2] }}</p>
 
             {% if admin %}
-                <a href="/borrar_opinion_jugador/{{ op[0] }}">
-                   onclick="return confirm('¿Eliminar esta opinión?')"
-                   style="color:#ff4d4d;">
-                   🗑️ Eliminar
+                <a
+                    href="/borrar_opinion_jugador/{{ op[0] }}"
+                    onclick="return confirm('¿Eliminar esta opinión?')"
+                    style="color:#ff4d4d;"
+                >
+                    🗑️ Eliminar
                 </a>
             {% endif %}
 
@@ -152,6 +154,10 @@
     {% endfor %}
 
 {% else %}
+
+    <p>No hay opiniones todavía.</p>
+
+{% endif %}
 
     <p>No hay opiniones todavía.</p>
 
