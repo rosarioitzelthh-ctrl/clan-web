@@ -684,6 +684,11 @@ def reset_semana():
         return f"💥 Error SQL: {e}"
 
     return redirect("/")
+
+
+
+
+
 @app.route("/perfil/<id>")
 def perfil(id):
 
@@ -706,6 +711,14 @@ def perfil(id):
     perfil = cursor.fetchone()
 
     cursor.execute("""
+        SELECT fecha_cumple
+        FROM cumpleanos
+        WHERE player_id=%s
+    """, (id,))
+
+    cumple = cursor.fetchone()
+
+    cursor.execute("""
         SELECT
             o.id,
             o.autor,
@@ -725,8 +738,11 @@ def perfil(id):
         jugador=jugador,
         perfil=perfil,
         opiniones=opiniones,
-        admin=session.get("admin", False)
+        admin=session.get("admin", False),
+        cumple=cumple
     )
+
+
 @app.route("/agregar_opinion_jugador/<id>", methods=["POST"])
 def agregar_opinion_jugador(id):
 
@@ -873,13 +889,25 @@ def editar_perfil(id):
 
     perfil = cursor.fetchone()
 
+    cursor.execute("""
+        SELECT fecha_cumple
+        FROM cumpleanos
+        WHERE player_id=%s
+    """, (id,))
+
+    cumple = cursor.fetchone()
+
     if not perfil:
         return f"❌ No existe perfil para el ID {id}."
 
     return render_template(
         "editar_perfil.html",
-        perfil=perfil
+        perfil=perfil,
+        cumple=cumple
     )
+
+
+
 @app.route("/guardar_perfil/<id>", methods=["POST"])
 def guardar_perfil(id):
 
@@ -893,6 +921,7 @@ def guardar_perfil(id):
         FROM perfiles
         WHERE player_id=%s
     """, (id,))
+
     actual = cursor.fetchone()
 
     foto_perfil_actual = actual[0] if actual else ""
@@ -931,6 +960,20 @@ def guardar_perfil(id):
         request.form.get("password", "1234"),
         id
     ))
+
+    fecha_cumple = request.form.get("fecha_cumple")
+
+    if fecha_cumple:
+        cursor.execute("""
+            INSERT INTO cumpleanos (player_id, fecha_cumple)
+            VALUES (%s, %s)
+            ON DUPLICATE KEY UPDATE fecha_cumple=%s
+        """, (id, fecha_cumple, fecha_cumple))
+    else:
+        cursor.execute("""
+            DELETE FROM cumpleanos
+            WHERE player_id=%s
+        """, (id,))
 
     conexion.commit()
 

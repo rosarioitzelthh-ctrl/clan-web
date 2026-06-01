@@ -186,6 +186,14 @@
         <b>🔥 Honor:</b> {{ jugador[3] }}
     </div>
 
+    {% if cumple %}
+
+    <div class="dato">
+        <b>🎂 Cumpleaños:</b> {{ cumple[0] }}
+    </div>
+
+    {% endif %}
+
     {% if session.get("jugador_id") == jugador[1] %}
         <br>
         <a href="/editar_perfil/{{ jugador[1] }}" class="btn-edit">

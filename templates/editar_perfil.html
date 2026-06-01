@@ -94,6 +94,14 @@
         placeholder="Escribe algo sobre ti..."
     >{{ perfil[4] or '' }}</textarea>
 
+
+<p>🎂 Fecha de cumpleaños</p>
+<input
+    type="date"
+    name="fecha_cumple"
+    value="{{ cumple[0] if cumple else '' }}"
+>
+
     <br><br>
 
     <button type="submit">
