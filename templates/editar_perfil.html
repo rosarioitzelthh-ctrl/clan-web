@@ -63,43 +63,44 @@
 
     <h1>⚙️ Editar perfil</h1>
 
-    <form action="/guardar_perfil/{{ perfil[0] }}" method="post">
+<form action="/guardar_perfil/{{ perfil[0] }}"
+      method="post"
+      enctype="multipart/form-data">
 
-        <p>🔐 Contraseña</p>
-        <input
-            name="password"
-            value="{{ perfil[1] }}"
-            required
-        >
+    <p>🔐 Contraseña</p>
+    <input
+        name="password"
+        value="{{ perfil[1] }}"
+        required
+    >
 
-        <p>🖼️ Foto de perfil URL</p>
-        <input
-            name="foto_perfil"
-            value="{{ perfil[2] or '' }}"
-            placeholder="Pega aquí el link de tu foto"
-        >
+    <p>🖼️ Foto de perfil</p>
+    <input
+        type="file"
+        name="foto_perfil"
+        accept="image/*"
+    >
 
-        <p>🌄 Foto de portada URL</p>
-        <input
-            name="foto_portada"
-            value="{{ perfil[3] or '' }}"
-            placeholder="Pega aquí el link de tu portada"
-        >
+    <p>🌄 Foto de portada</p>
+    <input
+        type="file"
+        name="foto_portada"
+        accept="image/*"
+    >
 
-        <p>📝 Descripción</p>
-        <textarea
-            name="descripcion"
-            placeholder="Escribe algo sobre ti..."
-        >{{ perfil[4] or '' }}</textarea>
+    <p>📝 Descripción</p>
+    <textarea
+        name="descripcion"
+        placeholder="Escribe algo sobre ti..."
+    >{{ perfil[4] or '' }}</textarea>
 
-        <br><br>
+    <br><br>
 
-        <button type="submit">
-            Guardar cambios
-        </button>
+    <button type="submit">
+        Guardar cambios
+    </button>
 
-    </form>
-
+</form>
     <br><br>
 
     <a href="/perfil/{{ perfil[0] }}">

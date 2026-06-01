@@ -1,3 +1,7 @@
+from werkzeug.utils import secure_filename
+
+UPLOAD_FOLDER = "static/uploads"
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 from flask import Flask, render_template, request, redirect, session
 import mysql.connector
 import logging
@@ -885,6 +889,34 @@ def guardar_perfil(id):
     conexion, cursor = get_db()
 
     cursor.execute("""
+        SELECT foto_perfil, foto_portada
+        FROM perfiles
+        WHERE player_id=%s
+    """, (id,))
+    actual = cursor.fetchone()
+
+    foto_perfil_actual = actual[0] if actual else ""
+    foto_portada_actual = actual[1] if actual else ""
+
+    foto_perfil = request.files.get("foto_perfil")
+    foto_portada = request.files.get("foto_portada")
+
+    ruta_perfil = foto_perfil_actual
+    ruta_portada = foto_portada_actual
+
+    if foto_perfil and foto_perfil.filename != "":
+        nombre = secure_filename(f"{id}_perfil_{foto_perfil.filename}")
+        ruta = os.path.join(UPLOAD_FOLDER, nombre)
+        foto_perfil.save(ruta)
+        ruta_perfil = "/" + ruta
+
+    if foto_portada and foto_portada.filename != "":
+        nombre = secure_filename(f"{id}_portada_{foto_portada.filename}")
+        ruta = os.path.join(UPLOAD_FOLDER, nombre)
+        foto_portada.save(ruta)
+        ruta_portada = "/" + ruta
+
+    cursor.execute("""
         UPDATE perfiles
         SET
             foto_perfil=%s,
@@ -893,14 +925,13 @@ def guardar_perfil(id):
             password=%s
         WHERE player_id=%s
     """, (
-        request.form["foto_perfil"],
-        request.form["foto_portada"],
-        request.form["descripcion"],
-        request.form["password"],
+        ruta_perfil,
+        ruta_portada,
+        request.form.get("descripcion", ""),
+        request.form.get("password", "1234"),
         id
     ))
 
     conexion.commit()
 
     return redirect(f"/perfil/{id}")
-
