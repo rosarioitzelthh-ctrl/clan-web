@@ -97,6 +97,17 @@ def inicio():
     conexion, cursor = get_db()
 
     try:
+        # 🔥 PRIMERO: jugadores para la tabla principal
+        cursor.execute("""
+            SELECT nombre, player_id, telefono,
+            honor, ronda1_gc, ronda2_gc, ronda3_gc,
+            puntos_extra, vidas
+            FROM jugadores
+        """)
+
+        filas_jugadores = cursor.fetchall()
+
+        # 🎂 SEGUNDO: cumpleañeros del mes
         cursor.execute("""
             SELECT j.nombre, j.player_id, c.fecha_cumple
             FROM cumpleanos c
@@ -106,11 +117,13 @@ def inicio():
         """)
 
         cumpleaneros = cursor.fetchall()
+
     except Exception as e:
         return f"💥 Error SQL: {e}"
 
     jugadores = []
-    for fila in cursor.fetchall():
+
+    for fila in filas_jugadores:
 
         telefono = fila[2] or ""
 
@@ -120,10 +133,8 @@ def inicio():
         r3 = int(fila[6] or 0)
         extra = int(fila[7] or 0)
 
-        # 🔥 CALCULAR PLACAS
         placas = r1 + r2 + r3
 
-        # 🔥 PUNTOS
         if honor >= 10000:
             puntos_honor = 8
         elif honor >= 4000:
@@ -147,18 +158,17 @@ def inicio():
         puntos = puntos_honor + puntos_placas + extra
 
         jugadores.append((
-            fila[0],   # nombre
-            fila[1],   # id
-            telefono,  # 📱 telefono
+            fila[0],
+            fila[1],
+            telefono,
             honor,
             r1, r2, r3,
             placas,
             extra,
             puntos,
-            fila[8]    # vidas
+            fila[8]
         ))
 
-    # 🔥 ORDENAR POR HONOR
     jugadores.sort(key=lambda x: x[3], reverse=True)
 
     return render_template(
