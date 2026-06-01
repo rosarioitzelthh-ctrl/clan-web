@@ -696,10 +696,16 @@ def perfil(id):
 
     # Opiniones del jugador
     cursor.execute("""
-        SELECT id, autor, comentario
-        FROM opiniones_jugador
-        WHERE player_id=%s
-        ORDER BY id DESC
+        SELECT
+            o.id,
+            o.autor,
+            j.nombre,
+            o.comentario
+        FROM opiniones_jugador o
+        LEFT JOIN jugadores j
+        ON o.autor = j.player_id
+        WHERE o.player_id=%s
+        ORDER BY o.id DESC
     """, (id,))
 
     opiniones = cursor.fetchall()
@@ -782,3 +788,52 @@ def logout_jugador():
     session.pop("jugador_id", None)
 
     return redirect(request.referrer or "/")
+
+@app.route("/editar_perfil/<id>")
+def editar_perfil(id):
+
+    if session.get("jugador_id") != id:
+        return redirect("/")
+
+    conexion, cursor = get_db()
+
+    cursor.execute("""
+        SELECT *
+        FROM perfiles
+        WHERE player_id=%s
+    """, (id,))
+
+    perfil = cursor.fetchone()
+
+    return render_template(
+        "editar_perfil.html",
+        perfil=perfil
+    )
+
+@app.route("/guardar_perfil/<id>", methods=["POST"])
+def guardar_perfil(id):
+
+    if session.get("jugador_id") != id:
+        return redirect("/")
+
+    conexion, cursor = get_db()
+
+    cursor.execute("""
+        UPDATE perfiles
+        SET
+            foto_perfil=%s,
+            foto_portada=%s,
+            descripcion=%s,
+            password=%s
+        WHERE player_id=%s
+    """, (
+        request.form["foto_perfil"],
+        request.form["foto_portada"],
+        request.form["descripcion"],
+        request.form["password"],
+        id
+    ))
+
+    conexion.commit()
+
+    return redirect(f"/perfil/{id}")

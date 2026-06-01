@@ -111,11 +111,30 @@
         <b>📱 Teléfono:</b> {{ jugador[2] }}
     </div>
 
-    <div class="dato">
-        <b>🔥 Honor:</b> {{ jugador[3] }}
-    </div>
+<div class="dato">
+    <b>🔥 Honor:</b> {{ jugador[3] }}
+</div>
 
-    <div class="opiniones">
+{% if session.get("jugador_id") == jugador[1] %}
+    <br>
+
+    <a href="/editar_perfil/{{ jugador[1] }}"
+       style="
+            display:inline-block;
+            padding:10px 15px;
+            background:#2196F3;
+            color:white;
+            border-radius:8px;
+            text-decoration:none;
+            font-weight:bold;
+       ">
+       ⚙️ Editar perfil
+    </a>
+
+    <br><br>
+{% endif %}
+
+<div class="opiniones">
 
         {% if not session.get("jugador_id") %}
 
@@ -191,36 +210,39 @@
 
         {% endif %}
 
-        {% if opiniones %}
+{% if opiniones %}
 
-            {% for op in opiniones %}
+    {% for op in opiniones %}
 
-                <div class="opinion">
+        <div class="opinion">
 
-                    {% if admin %}
-                        <b>👤 {{ op[1] }}</b>
-                        <br><br>
-                    {% endif %}
+            {% if admin %}
+                <b>👤 {{ op[2] }}</b>
+                <small style="color:gray;">
+                    (ID: {{ op[1] }})
+                </small>
+                <br><br>
+            {% endif %}
 
-                    <p>{{ op[2] }}</p>
+            <p>{{ op[3] }}</p>
 
-                    {% if admin %}
-                        <a href="/borrar_opinion_jugador/{{ op[0] }}"
-                           onclick="return confirm('¿Eliminar esta opinión?')"
-                           style="color:#ff4d4d;">
-                           🗑️ Eliminar
-                        </a>
-                    {% endif %}
+            {% if admin %}
+                <a href="/borrar_opinion_jugador/{{ op[0] }}"
+                   onclick="return confirm('¿Eliminar esta opinión?')"
+                   style="color:#ff4d4d;">
+                   🗑️ Eliminar
+                </a>
+            {% endif %}
 
-                </div>
+        </div>
 
-            {% endfor %}
+    {% endfor %}
 
-        {% else %}
+{% else %}
 
-            <p>No hay opiniones todavía.</p>
+    <p>No hay opiniones todavía.</p>
 
-        {% endif %}
+{% endif %}
 
     </div>
 
