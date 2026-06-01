@@ -39,6 +39,9 @@
             background:#1a1a28;
             padding:15px;
             border-radius:10px;
+
+            max-height:600px;
+            overflow-y:auto;
         }
 
         textarea{
@@ -77,6 +80,19 @@
             padding:10px;
             margin-top:10px;
             border-radius:8px;
+
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            white-space: pre-wrap;
+
+            max-width:100%;
+        }
+
+        .login-box{
+            background:#111;
+            padding:15px;
+            border-radius:10px;
+            margin-bottom:15px;
         }
     </style>
 </head>
@@ -101,17 +117,61 @@
 
     <div class="opiniones">
 
+        {% if not session.get("jugador_id") %}
+
+        <div class="login-box">
+
+            <form action="/login_jugador" method="post">
+
+                <input
+                    type="hidden"
+                    name="volver"
+                    value="{{ request.path }}"
+                >
+
+                <input
+                    name="player_id"
+                    placeholder="Tu ID"
+                    required
+                >
+
+                <input
+                    type="password"
+                    name="password"
+                    placeholder="Contraseña"
+                    required
+                >
+
+                <button type="submit">
+                    🔐 Iniciar sesión
+                </button>
+
+            </form>
+
+        </div>
+
+        {% else %}
+
+        <div class="login-box">
+
+            <p style="color:#00ff99;">
+                🔓 Sesión iniciada como
+                <b>{{ session["jugador_id"] }}</b>
+            </p>
+
+            <a href="/logout_jugador">
+                🚪 Cerrar sesión
+            </a>
+
+        </div>
+
+        {% endif %}
+
         <h2>💬 Opiniones</h2>
 
+        {% if session.get("jugador_id") %}
+
         <form action="/agregar_opinion_jugador/{{ jugador[1] }}" method="post">
-
-            <input
-                name="autor"
-                placeholder="Tu nombre"
-                required
-            >
-
-            <br><br>
 
             <textarea
                 name="comentario"
@@ -129,37 +189,38 @@
 
         <hr>
 
-{% if opiniones %}
+        {% endif %}
 
-    {% for op in opiniones %}
+        {% if opiniones %}
 
-        <div class="opinion">
+            {% for op in opiniones %}
 
-    {% if admin %}
-        <b>👤 {{ op[1] }}</b>
-    {% endif %}
+                <div class="opinion">
 
-    <p>{{ op[2] }}</p>
+                    {% if admin %}
+                        <b>👤 {{ op[1] }}</b>
+                        <br><br>
+                    {% endif %}
 
-    {% if admin %}
-        <a href="/borrar_opinion_jugador/{{ op[0] }}"
-           onclick="return confirm('¿Eliminar esta opinión?')"
-           style="color:#ff4d4d;">
-           🗑️ Eliminar
-        </a>
-    {% endif %}
+                    <p>{{ op[2] }}</p>
 
-</div>
+                    {% if admin %}
+                        <a href="/borrar_opinion_jugador/{{ op[0] }}"
+                           onclick="return confirm('¿Eliminar esta opinión?')"
+                           style="color:#ff4d4d;">
+                           🗑️ Eliminar
+                        </a>
+                    {% endif %}
 
-        </div>
+                </div>
 
-    {% endfor %}
+            {% endfor %}
 
-{% else %}
+        {% else %}
 
-    <p>No hay opiniones todavía.</p>
+            <p>No hay opiniones todavía.</p>
 
-{% endif %}
+        {% endif %}
 
     </div>
 

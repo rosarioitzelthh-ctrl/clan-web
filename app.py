@@ -683,6 +683,9 @@ def perfil(id):
 @app.route("/agregar_opinion_jugador/<id>", methods=["POST"])
 def agregar_opinion_jugador(id):
 
+    if not session.get("jugador_id"):
+        return redirect(f"/perfil/{id}")
+
     conexion, cursor = get_db()
 
     cursor.execute("""
@@ -691,7 +694,7 @@ def agregar_opinion_jugador(id):
         VALUES (%s,%s,%s)
     """, (
         id,
-        request.form["autor"],
+        session["jugador_id"],
         request.form["comentario"]
     ))
 
@@ -713,5 +716,38 @@ def borrar_opinion_jugador(id):
     """, (id,))
 
     conexion.commit()
+
+    return redirect(request.referrer or "/")
+
+
+@app.route("/login_jugador", methods=["POST"])
+def login_jugador():
+
+    conexion, cursor = get_db()
+
+    player_id = request.form["player_id"]
+    password = request.form["password"]
+
+    cursor.execute("""
+        SELECT player_id
+        FROM perfiles
+        WHERE player_id=%s
+        AND password=%s
+    """, (player_id, password))
+
+    perfil = cursor.fetchone()
+
+    if perfil:
+
+        session["jugador_id"] = player_id
+
+        return redirect(request.form["volver"])
+
+    return redirect(request.form["volver"] + "?login=0")
+
+@app.route("/logout_jugador")
+def logout_jugador():
+
+    session.pop("jugador_id", None)
 
     return redirect(request.referrer or "/")
