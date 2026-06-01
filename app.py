@@ -639,6 +639,7 @@ def reset_semana():
                 ronda1_gc=0,
                 ronda2_gc=0,
                 ronda3_gc=0,
+                puntos_extra=0,
                 penalizado=0
         """)
 
@@ -648,3 +649,21 @@ def reset_semana():
         return f"💥 Error SQL: {e}"
 
     return redirect("/")
+
+@app.route("/perfil/<id>")
+def perfil(id):
+
+    conexion, cursor = get_db()
+
+    cursor.execute("""
+        SELECT *
+        FROM jugadores
+        WHERE player_id=%s
+    """, (id,))
+
+    jugador = cursor.fetchone()
+
+    return render_template(
+        "perfil.html",
+        jugador=jugador
+    )
