@@ -1,16 +1,16 @@
-from werkzeug.utils import secure_filename
-
-UPLOAD_FOLDER = "static/uploads"
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 from flask import Flask, render_template, request, redirect, session
 import mysql.connector
 import logging
+import os
+from werkzeug.utils import secure_filename
+
 logging.basicConfig(level=logging.INFO)
+
+UPLOAD_FOLDER = "static/uploads"
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 app = Flask(__name__)
 app.secret_key = "clave_secreta_123"
-import os
-
 
 conexion = None
 cursor = None
