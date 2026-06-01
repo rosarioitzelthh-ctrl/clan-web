@@ -192,17 +192,34 @@ def agregar():
         cursor.execute("""
             INSERT INTO jugadores
             (nombre, player_id, telefono,
-             honor,
-             ronda1_gc, ronda2_gc, ronda3_gc,
-             puntos_extra,
-             vidas,
-             penalizado)
+            honor,
+            ronda1_gc, ronda2_gc, ronda3_gc,
+            puntos_extra,
+            vidas,
+            penalizado)
             VALUES (%s,%s,%s,0,0,0,0,0,3,0)
         """, (
             request.form["nombre"],
             request.form["id"],
             request.form["telefono"]
         ))
+
+        cursor.execute("""
+            INSERT INTO perfiles
+            (
+                player_id,
+                password,
+                foto_perfil,
+                foto_portada,
+                descripcion
+            )
+            VALUES (%s,%s,'','','')
+        """, (
+            request.form["id"],
+            "1234"
+        ))
+
+conexion.commit()
 
         conexion.commit()
 
@@ -223,10 +240,24 @@ def eliminar(id):
     try:
         conexion, cursor = get_db()
 
-        cursor.execute(
-            "DELETE FROM jugadores WHERE player_id=%s LIMIT 1",
-            (id,)
-        )
+        # Borrar opiniones del jugador
+        cursor.execute("""
+            DELETE FROM opiniones_jugador
+            WHERE player_id=%s
+        """, (id,))
+
+        # Borrar perfil del jugador
+        cursor.execute("""
+            DELETE FROM perfiles
+            WHERE player_id=%s
+        """, (id,))
+
+        # Borrar jugador
+        cursor.execute("""
+            DELETE FROM jugadores
+            WHERE player_id=%s
+            LIMIT 1
+        """, (id,))
 
         conexion.commit()
 
