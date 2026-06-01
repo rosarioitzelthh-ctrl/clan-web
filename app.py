@@ -699,3 +699,19 @@ def agregar_opinion_jugador(id):
 
     return redirect(f"/perfil/{id}")
     
+@app.route("/borrar_opinion_jugador/<int:id>")
+def borrar_opinion_jugador(id):
+
+    if not session.get("admin"):
+        return redirect("/")
+
+    conexion, cursor = get_db()
+
+    cursor.execute("""
+        DELETE FROM opiniones_jugador
+        WHERE id=%s
+    """, (id,))
+
+    conexion.commit()
+
+    return redirect(request.referrer or "/")
