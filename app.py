@@ -664,12 +664,12 @@ def perfil(id):
     jugador = cursor.fetchone()
 
     # Opiniones del jugador
-        cursor.execute("""
-            SELECT id, autor, comentario
-            FROM opiniones_jugador
-            WHERE player_id=%s
-            ORDER BY id DESC
-        """, (id,))
+    cursor.execute("""
+        SELECT autor, comentario
+        FROM opiniones_jugador
+        WHERE player_id=%s
+        ORDER BY id DESC
+    """, (id,))
 
     opiniones = cursor.fetchall()
 
