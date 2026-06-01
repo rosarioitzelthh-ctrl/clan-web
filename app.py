@@ -649,12 +649,12 @@ def reset_semana():
         return f"💥 Error SQL: {e}"
 
     return redirect("/")
+
 @app.route("/perfil/<id>")
 def perfil(id):
 
     conexion, cursor = get_db()
 
-    # Datos del jugador
     cursor.execute("""
         SELECT *
         FROM jugadores
@@ -663,9 +663,8 @@ def perfil(id):
 
     jugador = cursor.fetchone()
 
-    # Opiniones del jugador
     cursor.execute("""
-        SELECT autor, comentario
+        SELECT id, autor, comentario
         FROM opiniones_jugador
         WHERE player_id=%s
         ORDER BY id DESC
@@ -676,7 +675,8 @@ def perfil(id):
     return render_template(
         "perfil.html",
         jugador=jugador,
-        opiniones=opiniones
+        opiniones=opiniones,
+        admin=session.get("admin", False)
     )
 
 @app.route("/agregar_opinion_jugador/<id>", methods=["POST"])
@@ -697,3 +697,20 @@ def agregar_opinion_jugador(id):
     conexion.commit()
 
     return redirect(f"/perfil/{id}")
+
+@app.route("/borrar_opinion/<int:id>")
+def borrar_opinion(id):
+
+    if not session.get("admin"):
+        return redirect("/")
+
+    conexion, cursor = get_db()
+
+    cursor.execute("""
+        DELETE FROM opiniones_jugador
+        WHERE id=%s
+    """, (id,))
+
+    conexion.commit()
+
+    return redirect(request.referrer or "/")

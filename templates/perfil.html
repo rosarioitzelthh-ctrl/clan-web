@@ -129,25 +129,33 @@
 
         <hr>
 
-        {% if opiniones %}
+{% if opiniones %}
 
-            {% for op in opiniones %}
+    {% for op in opiniones %}
 
-                <div class="opinion">
+        <div class="opinion">
 
-                    <b>{{ op[0] }}</b>
+            <b>👤 {{ op[1] }}</b>
 
-                    <p>{{ op[1] }}</p>
+            <p>{{ op[2] }}</p>
 
-                </div>
+            {% if admin %}
+                <a href="/borrar_opinion/{{ op[0] }}"
+                   onclick="return confirm('¿Eliminar esta opinión?')"
+                   style="color:#ff4d4d;">
+                   🗑️ Eliminar
+                </a>
+            {% endif %}
 
-            {% endfor %}
+        </div>
 
-        {% else %}
+    {% endfor %}
 
-            <p>No hay opiniones todavía.</p>
+{% else %}
 
-        {% endif %}
+    <p>No hay opiniones todavía.</p>
+
+{% endif %}
 
     </div>
 
