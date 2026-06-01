@@ -244,7 +244,39 @@ font-weight:bold;
 </div>
 
 
+<button onclick="mostrarCumples()" class="btn-top" style="
+    background:linear-gradient(45deg,#ff66cc,#ffcc00);
+    box-shadow:0 0 10px #ff66cc;
+">
+🎂 CUMPLEAÑEROS DEL MES!
+</button>
 
+<div id="cumplesBox" style="
+margin:15px auto;
+padding:15px;
+width:50%;
+background:#111;
+border:2px solid #ff66cc;
+border-radius:10px;
+display:none;
+box-shadow:0 0 15px #ff66cc;
+font-weight:bold;
+">
+    <h2>🎉 Cumpleañeros del mes 🎂</h2>
+
+    {% if cumpleaneros %}
+        {% for c in cumpleaneros %}
+            <p>
+                🥳 <a href="/perfil/{{ c[1] }}" style="color:#00ff99;">
+                    {{ c[0] }}
+                </a>
+                — {{ c[2] }}
+            </p>
+        {% endfor %}
+    {% else %}
+        <p>😭 No hay cumpleañeros este mes</p>
+    {% endif %}
+</div>
 
 
 
@@ -894,7 +926,51 @@ function lanzarConfetti(){
 
 
 
+<script>
+let visibleCumples = false;
 
+function mostrarCumples(){
+    let box = document.getElementById("cumplesBox");
+
+    if(visibleCumples){
+        box.style.display = "none";
+        visibleCumples = false;
+        return;
+    }
+
+    box.style.display = "block";
+    visibleCumples = true;
+
+    lanzarConfettiCumple();
+}
+
+function lanzarConfettiCumple(){
+    let emojis = ["🎂","🎉","🥳","🎈","✨","🍰"];
+
+    for(let i=0;i<35;i++){
+        let conf = document.createElement("div");
+
+        conf.innerHTML = emojis[Math.floor(Math.random()*emojis.length)];
+        conf.style.position = "fixed";
+        conf.style.top = "0px";
+        conf.style.left = Math.random()*window.innerWidth + "px";
+        conf.style.fontSize = "24px";
+        conf.style.zIndex = 9999;
+
+        document.body.appendChild(conf);
+
+        let anim = conf.animate([
+            { transform: "translateY(0px) rotate(0deg)" },
+            { transform: `translateY(${window.innerHeight}px) rotate(360deg)` }
+        ], {
+            duration: 1500 + Math.random()*1200,
+            easing: "linear"
+        });
+
+        anim.onfinish = () => conf.remove();
+    }
+}
+</script>
 
 
 </body>

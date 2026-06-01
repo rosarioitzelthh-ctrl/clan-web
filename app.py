@@ -98,11 +98,14 @@ def inicio():
 
     try:
         cursor.execute("""
-            SELECT nombre, player_id, telefono,
-            honor, ronda1_gc, ronda2_gc, ronda3_gc,
-            puntos_extra, vidas
-            FROM jugadores
+            SELECT j.nombre, j.player_id, c.fecha_cumple
+            FROM cumpleanos c
+            JOIN jugadores j ON c.player_id = j.player_id
+            WHERE MONTH(c.fecha_cumple) = MONTH(CURDATE())
+            ORDER BY DAY(c.fecha_cumple)
         """)
+
+        cumpleaneros = cursor.fetchall()
     except Exception as e:
         return f"💥 Error SQL: {e}"
 
@@ -161,6 +164,7 @@ def inicio():
     return render_template(
         "index.html",
         jugadores=jugadores,
+        cumpleaneros=cumpleaneros,
         admin=session.get("admin")
     )
     
